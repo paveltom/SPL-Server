@@ -1,4 +1,4 @@
-package ServerModule;
+package prjct.ServerModule;
 
 import java.util.LinkedList;
 import java.util.Map;

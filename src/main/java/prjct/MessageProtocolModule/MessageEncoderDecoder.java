@@ -1,4 +1,4 @@
-package MessageProtocolModule;
+package prjct.MessageProtocolModule;
 
 public interface MessageEncoderDecoder<T> {
 

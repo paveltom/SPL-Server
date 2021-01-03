@@ -1,4 +1,4 @@
-package MessageProtocolModule;
+package prjct.MessageProtocolModule;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -33,7 +33,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
         bytes[len++] = nextByte;
     }
 
-    private String popString() {
+    public String popString() { //change to private!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         //notice that we explicitly requesting that the string will be decoded from UTF-8
         //this is not actually required as it is the default encoding in java.
         String result = new String(bytes, 0, len, StandardCharsets.UTF_8);

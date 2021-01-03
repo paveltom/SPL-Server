@@ -1,7 +1,7 @@
-package ServerModule;
+package prjct.ServerModule;
 
-import MessageProtocolModule.MessagingProtocol;
-import MessageProtocolModule.MessageEncoderDecoder;
+import prjct.MessageProtocolModule.MessagingProtocol;
+import prjct.MessageProtocolModule.MessageEncoderDecoder;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

@@ -1,7 +1,7 @@
-package ServerModule;
+package prjct.ServerModule;
 
-import MessageProtocolModule.MessageEncoderDecoder;
-import MessageProtocolModule.MessagingProtocol;
+import prjct.MessageProtocolModule.MessageEncoderDecoder;
+import prjct.MessageProtocolModule.MessagingProtocol;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
