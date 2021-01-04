@@ -190,11 +190,26 @@ public class EchoProtocol implements MessagingProtocol<String> {
 
         return "ACK " + currOpCode + "\n" + "Course: (" + course.getNum() + ") " + course.getName() + "\n"
                 + "Seats available: " + course.getCurrStudsNum() + "/" + course.getMaxStudsNum() + "\n"
-                + "Students Registered: " + usersOutput;
+                + "Students Registered: " + usersOutput + "\n";
     }
 
-    private String studentstat() {
-        return UnsupportedOperationException();
+    private String studentstat(String msg) {
+        if (currUser == null)
+            return "ERROR " + currOpCode + "\n" + "(You need to login in order to perform actions...)\n";
+        if (!currUser.isAdmin())
+            return "ERROR " + currOpCode + "\n" + "(You have to be an admin in order to perform this action...)\n";
+        User user = database.getUserByUsername(msg.trim());
+        if (user == null)
+            return "ERROR " + currOpCode + "\n" + "(There is no such user...)\n";
+        if (user.isAdmin())
+            return "ERROR " + currOpCode + "\n" + "(This user is an admin and not a student...)\n";
+
+        String coursesOutput;
+        if (user.getCourses().isEmpty())
+            coursesOutput = "[]";
+        else coursesOutput = Arrays.toString(user.getCourses().toArray());
+        return "ACK " + currOpCode + "\n" + "Student: " + user.getUsername() + "\n"
+                + "Courses: " + coursesOutput + "\n";
     }
 
     private String isregistered() {
