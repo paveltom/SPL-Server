@@ -8,6 +8,7 @@ import prjct.commands.Callback;
 
 import java.lang.UnsupportedOperationException;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -164,8 +165,13 @@ public class EchoProtocol implements MessagingProtocol<String> {
         return "ACK " + currOpCode;
     }
 
-    private String kdamcheck() {
-        return UnsupportedOperationException();
+    private String kdamcheck(String msg) {
+        if (currUser == null)
+            return "ERROR " + currOpCode + "\n" + "(You need to login in order to perform actions...)\n";
+        Course course = database.getCourseByNum(Integer.parseInt(msg.trim()));
+        if (course == null)
+            return "ERROR " + currOpCode + "\n" + "(There is no such course...)\n";
+        return "ACK " + currOpCode + "\n" + Arrays.toString(course.getKdamim()) + "\n";
     }
 
     private String coursestat() {
