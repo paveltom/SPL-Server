@@ -20,9 +20,11 @@ public class EchoProtocol implements MessagingProtocol<String> {
             shouldTerminate = false;
             database = Database.getInstance();
             String output = "";
-            int indOf = msg.indexOf(" ");
+            int indOf = 1;
+            if (msg.trim().length() > 1)
+                indOf = msg.indexOf(" ");
             currOpCode = msg.substring(0, indOf);
-            msg = msg.substring(indOf + 1);
+            msg = msg.substring(indOf).trim();
             switch (currOpCode) {
                 case "1":
                     return adminreg(msg);
@@ -49,7 +51,7 @@ public class EchoProtocol implements MessagingProtocol<String> {
             }
             return output;
         } catch (Exception e) {
-            return "ERR " + currOpCode;
+            return "ERR " + currOpCode + "\n(" + e.getMessage() + ")\n";
         }
     }
 

@@ -26,6 +26,7 @@ public class Database {
 	private Database() {
 		courses = new ArrayList<>();
 		users = new ArrayList<>();
+		initialize(".Courses.txt");
 	}
 
 	/**
