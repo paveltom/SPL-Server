@@ -70,6 +70,18 @@ public class Database {
 		return true;
 	}
 
+	public void addUser(User u){
+		this.users.add(u);
+	}
+
+	public User getUserByUsername(String username){
+		return users.stream().filter(u -> u.getUsername().equals(username)).findFirst().orElse(null);
+	}
+
+	public Course getCourseByNum(int courseNum){
+		return courses.stream().filter(c -> c.getNum() == courseNum).findFirst().orElse(null);
+	}
+
 	public List<Course> getCourses() {
 		return courses;
 	}
