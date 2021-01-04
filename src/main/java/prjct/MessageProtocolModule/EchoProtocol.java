@@ -3,10 +3,6 @@ package prjct.MessageProtocolModule;
 import prjct.Course;
 import prjct.Database;
 import prjct.User;
-import prjct.commands.Callback;
-
-
-import java.lang.UnsupportedOperationException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -14,7 +10,6 @@ import java.util.stream.Collectors;
 public class EchoProtocol implements MessagingProtocol<String> {
 
     private boolean shouldTerminate = false;
-    //private HashMap<String, Callback> requestExecute;
     private User currUser = null;
     private Database database;
     private String currOpCode = "";
@@ -30,49 +25,33 @@ public class EchoProtocol implements MessagingProtocol<String> {
             msg = msg.substring(indOf + 1);
             switch (currOpCode) {
                 case "1":
-                    // code block
-                    break;
+                    return adminreg(msg);
                 case "2":
-                    // code block
-                    break;
+                    return studentreg(msg);
                 case "3":
-                    // code block
-                    break;
+                    return login(msg);
                 case "4":
-                    // code block
-                    break;
+                    return logout();
                 case "5":
-                    // code block
-                    break;
+                    return coursereg(msg);
                 case "6":
-                    // code block
-                    break;
+                    return kdamcheck(msg);
                 case "7":
-                    // code block
-                    break;
+                    return coursestat(msg);
                 case "8":
-                    // code block
-                    break;
+                    return studentstat(msg);
                 case "9":
-                    // code block
-                    break;
+                    return isregistered(msg);
                 case "10":
-                    // code block
-                    break;
+                    return unregister(msg);
                 case "11":
-                    // code block
-                    break;
+                    return mycourses();
             }
             return output;
         } catch (Exception e) {
             return "ERR " + currOpCode;
         }
     }
-
-
-//    private String createEcho(String message) {
-//        throw new UnsupportedOperationException();
-//    }
 
     @Override
     public boolean shouldTerminate() {
@@ -137,12 +116,6 @@ public class EchoProtocol implements MessagingProtocol<String> {
     }
 
     private String coursereg(String msg) {
-        /*
-         no such course is exist
-         no seats are available in this course
-         the student does not have all the Kdam courses
-         the student is not logged in)
-         */
         if (currUser == null)
             return "ERROR " + currOpCode + "\n" + "(You need to login in order to perform actions...)\n";
         Course course = database.getCourseByNum(Integer.parseInt(msg.trim()));
