@@ -132,8 +132,10 @@ public class EchoProtocol implements MessagingProtocol<String> {
                         return "ERROR " + currOpCode + "\n" + "( " + currUser.getUsername() + " does not have all the required KDAMIM...)\n";
             }
         }
-        if (!course.addStudent())
+        if (course.getMaxStudsNum() == course.getCurrStudsNum())
             return "ERROR " + currOpCode + "\n" + "(There is no available place in this course...)\n";
+        course.addStudent();
+        currUser.addCourse(course);
         return "ACK " + currOpCode;
     }
 
@@ -143,7 +145,7 @@ public class EchoProtocol implements MessagingProtocol<String> {
         Course course = database.getCourseByNum(Integer.parseInt(msg.trim()));
         if (course == null)
             return "ERROR " + currOpCode + "\n" + "(There is no such course...)\n";
-        return "ACK " + currOpCode + "\n" + Arrays.toString(course.getKdamim()) + "\n";
+        return "ACK " + currOpCode + "\n" + course.kdamimToString() + "\n";
     }
 
     private String coursestat(String msg) {
