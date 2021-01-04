@@ -44,6 +44,11 @@ public class User {
         return adminIndctr;
     }
 
+    public void unregisterCourse(Course c){
+        if (this.courses.contains(c))
+        this.courses.remove(c);
+    }
+
     public void addCourse(Course c){
         Iterator<Course> itr = courses.iterator();
         Course tempCourse = itr.next();

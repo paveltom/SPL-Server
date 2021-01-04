@@ -215,8 +215,6 @@ public class EchoProtocol implements MessagingProtocol<String> {
     private String isregistered(String msg) {
         if (currUser == null)
             return "ERROR " + currOpCode + "\n" + "(You need to login in order to perform actions...)\n";
-        if (!currUser.isAdmin())
-            return "ERROR " + currOpCode + "\n" + "(You have to be an admin in order to perform this action...)\n";
         Course course = database.getCourseByNum(Integer.parseInt(msg.trim()));
         if (course == null)
             return "ERROR " + currOpCode + "\n" + "(There is no such course...)\n";
@@ -225,42 +223,22 @@ public class EchoProtocol implements MessagingProtocol<String> {
         return "ACK " + currOpCode + "\n" + "NOT REGISTERED\n";
     }
 
-    private String unregister() {
-        return UnsupportedOperationException();
+    private String unregister(String msg) {
+        if (currUser == null)
+            return "ERROR " + currOpCode + "\n" + "(You need to login in order to perform actions...)\n";
+        Course course = database.getCourseByNum(Integer.parseInt(msg.trim()));
+        if (course == null)
+            return "ERROR " + currOpCode + "\n" + "(There is no such course...)\n";
+        if (!currUser.getCourses().contains(course))
+            return "ERROR " + currOpCode + "\n" + "(" + currUser.getUsername() + " is not registered to this course...)\n";
+        currUser.unregisterCourse(course);
+        return "ACK " + currOpCode + "\n";
     }
 
     private String mycourses() {
-        return UnsupportedOperationException();
+        if (currUser == null)
+            return "ERROR " + currOpCode + "\n" + "(You need to login in order to perform actions...)\n";
+        return currUser.coursesToString();
     }
 
-    private void createrequestexecute() {
-        /*
-        adminreg
-        studentreg
-        login
-        logout
-        coursereg
-        kdamcheck
-
-        coursestat:
-                   students sorted alphabetically:
-                                 //        if (list.size() > 0) {
-//                                                collections.sort(list, new comparator<campaign>() {
-                                //                @override
-                                //                public int compare(final campaign object1, final campaign object2) {
-                            //                    return object1.getname().compareto(object2.getname());
-//                }
-//            });
-//        }
-
-        studentstat
-        isregistered
-        unregister
-        mycourses
-
-        servertoclient:
-        ack
-        err
-         */
-    }
 }
