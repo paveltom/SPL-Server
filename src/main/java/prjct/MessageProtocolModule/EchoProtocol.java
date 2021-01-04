@@ -212,8 +212,17 @@ public class EchoProtocol implements MessagingProtocol<String> {
                 + "Courses: " + coursesOutput + "\n";
     }
 
-    private String isregistered() {
-        return UnsupportedOperationException();
+    private String isregistered(String msg) {
+        if (currUser == null)
+            return "ERROR " + currOpCode + "\n" + "(You need to login in order to perform actions...)\n";
+        if (!currUser.isAdmin())
+            return "ERROR " + currOpCode + "\n" + "(You have to be an admin in order to perform this action...)\n";
+        Course course = database.getCourseByNum(Integer.parseInt(msg.trim()));
+        if (course == null)
+            return "ERROR " + currOpCode + "\n" + "(There is no such course...)\n";
+        if (currUser.getCourses().contains(course))
+            return "ACK " + currOpCode + "\n" + "REGISTERED\n";
+        return "ACK " + currOpCode + "\n" + "NOT REGISTERED\n";
     }
 
     private String unregister() {
