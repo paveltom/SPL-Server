@@ -38,6 +38,16 @@ public class Course {
         return kdamim;
     }
 
+    public String kdamimToString(){
+        String output = "[";
+        for (int i = 0; i < kdamim.length; i++){
+            output = output + kdamim[i] + ",";
+        }
+        output = output.substring(0, (output.length()-1));
+        output = output + "]";
+        return output;
+    }
+
     public int getCurrStudsNum() {
         return currStudsNum;
     }
