@@ -8,9 +8,8 @@ import prjct.commands.Callback;
 
 import java.lang.UnsupportedOperationException;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class EchoProtocol implements MessagingProtocol<String> {
 
@@ -174,17 +173,24 @@ public class EchoProtocol implements MessagingProtocol<String> {
         return "ACK " + currOpCode + "\n" + Arrays.toString(course.getKdamim()) + "\n";
     }
 
-    private String coursestat() {
-        //students sorted alphabetically:
-        //        if (list.size() > 0) {
-//                                                collections.sort(list, new comparator<campaign>() {
-        //                @override
-        //                public int compare(final campaign object1, final campaign object2) {
-        //                    return object1.getname().compareto(object2.getname());
-//                }
-//            });
-//        }
-        return UnsupportedOperationException();
+    private String coursestat(String msg) {
+        if (currUser == null)
+            return "ERROR " + currOpCode + "\n" + "(You need to login in order to perform actions...)\n";
+        if (!currUser.isAdmin())
+            return "ERROR " + currOpCode + "\n" + "(You have to be an admin in order to perform this action...)\n";
+        Course course = database.getCourseByNum(Integer.parseInt(msg.trim()));
+        if (course == null)
+            return "ERROR " + currOpCode + "\n" + "(There is no such course...)\n";
+        List<User> usersIn = database.getUsers().stream().filter(u -> u.getCourses().contains(course)).collect(Collectors.toList());
+        String usersOutput = "[]";
+        if (!usersIn.isEmpty()) {
+            usersIn.sort(Comparator.comparing(User::getUsername));
+            usersOutput = Arrays.toString(usersIn.stream().map(User::getUsername).collect(Collectors.toList()).toArray());
+        }
+
+        return "ACK " + currOpCode + "\n" + "Course: (" + course.getNum() + ") " + course.getName() + "\n"
+                + "Seats available: " + course.getCurrStudsNum() + "/" + course.getMaxStudsNum() + "\n"
+                + "Students Registered: " + usersOutput;
     }
 
     private String studentstat() {

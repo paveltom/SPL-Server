@@ -40,6 +40,9 @@ public class User {
         return this.password.equals(pass);
     }
 
+    public boolean isAdmin() {
+        return adminIndctr;
+    }
 
     public void addCourse(Course c){
         Iterator<Course> itr = courses.iterator();
