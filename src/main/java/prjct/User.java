@@ -9,11 +9,13 @@ public class User {
     private String username;
     private String password;
     List<Course> courses;
+    private boolean adminIndctr;
 
-    public User (String username, String password){
+    public User (String username, String password, boolean isAdmin ){
         this.username = username;
         this.password = password;
         this.courses = new ArrayList<Course>();
+        this.adminIndctr = isAdmin;
     }
 
     public String getUsername() {

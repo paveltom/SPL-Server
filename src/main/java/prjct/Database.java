@@ -40,7 +40,6 @@ public class Database {
 	 * into the prjct.Database, returns true if successful.
 	 */
 	boolean initialize(String coursesFilePath) {
-		//435|Swordsmanship: From Hero to King|[482,530,912]|1
 		try (BufferedReader br = new BufferedReader(new FileReader(coursesFilePath))) {
 			int courseOrdNum = 0;
 			for (String line; (line = br.readLine()) != null; ) {

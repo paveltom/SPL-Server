@@ -1,6 +1,7 @@
 package prjct.MessageProtocolModule;
 
-import prjct.api.Callback;
+import prjct.User;
+import prjct.commands.Callback;
 
 import java.lang.UnsupportedOperationException;
 
@@ -10,6 +11,7 @@ public class EchoProtocol implements MessagingProtocol<String> {
 
     private boolean shouldTerminate = false;
     private HashMap<String, Callback> requestExecute;
+    private User currUser = null;
 
     @Override
     public String process(String msg) {

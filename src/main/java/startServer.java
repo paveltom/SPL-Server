@@ -11,7 +11,7 @@ public class startServer {
 //        String result = new String(, 0, len, StandardCharsets.UTF_8);
 
         LineMessageEncoderDecoder encdec = new LineMessageEncoderDecoder();
-        String s = "STUDENTREG Morty a123\n";
+        String s = "00 02 Morty a123\n";
         byte[] bytes = s.getBytes();
         System.out.println(Arrays.toString(bytes));
         for (int i = 0; i< bytes.length - 1; i++){

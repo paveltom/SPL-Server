@@ -1,4 +1,4 @@
-package prjct.api;
+package prjct.commands;
 
 /**
  * a callback is a function designed to be called in different cases via anonymous definition.
