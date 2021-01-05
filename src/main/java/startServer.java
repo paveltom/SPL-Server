@@ -29,6 +29,7 @@ public class startServer {
         System.out.println(echo.process("08 Morty"));
         System.out.println(echo.process("07 32"));
         System.out.println(echo.process("07 342"));
+        System.out.println(echo.process("07 530"));
         System.out.println(echo.process("04"));
 
 

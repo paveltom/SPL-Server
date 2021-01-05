@@ -50,14 +50,16 @@ public class User {
     }
 
     public void addCourse(Course c){
-        Iterator<Course> itr = courses.iterator();
-        Course tempCourse = itr.next();
         int insrtIndex = 0;
-        while(tempCourse != null && c.getOrderNum() > tempCourse.getOrderNum()){
-            insrtIndex++;
-            tempCourse = itr.next();
-            if (tempCourse != null && c.getOrderNum() < tempCourse.getOrderNum())
-                break;
+        if(courses.size() > 0) {
+            Iterator<Course> itr = courses.iterator();
+            Course tempCourse = itr.next();
+            while (tempCourse != null && c.getOrderNum() > tempCourse.getOrderNum()) {
+                insrtIndex++;
+                tempCourse = itr.next();
+                if (tempCourse != null && c.getOrderNum() < tempCourse.getOrderNum())
+                    break;
+            }
         }
         courses.add(insrtIndex, c);
     }

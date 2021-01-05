@@ -51,7 +51,7 @@ public class EchoProtocol implements MessagingProtocol<String> {
             }
             return output;
         } catch (Exception e) {
-            return "ERR " + currOpCode + "\n(" + e.getMessage() + ")\n";
+            return "ERROR " + currOpCode + "\n(" + e.getMessage() + ")\n";
         }
     }
 
@@ -138,7 +138,7 @@ public class EchoProtocol implements MessagingProtocol<String> {
             return "ERROR " + currOpCode + "\n" + "(There is no available place in this course...)\n";
         course.addStudent();
         currUser.addCourse(course);
-        return "ACK " + currOpCode;
+        return "ACK " + currOpCode + "\n";
     }
 
     private String kdamcheck(String msg) {
@@ -166,7 +166,7 @@ public class EchoProtocol implements MessagingProtocol<String> {
         }
 
         return "ACK " + currOpCode + "\n" + "Course: (" + course.getNum() + ") " + course.getName() + "\n"
-                + "Seats available: " + course.getCurrStudsNum() + "/" + course.getMaxStudsNum() + "\n"
+                + "Seats available: " + (course.getMaxStudsNum() - course.getCurrStudsNum()) + "/" + course.getMaxStudsNum() + "\n"
                 + "Students Registered: " + usersOutput + "\n";
     }
 
