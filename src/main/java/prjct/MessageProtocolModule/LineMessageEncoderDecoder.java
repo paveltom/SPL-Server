@@ -36,11 +36,11 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
             flag1 = false;
             flag2 = false;
 
-            if(bytes[len] == 0 & bytes[len-1] == 0) {
+            if(bytes[len-1] == 0) {
                 zeroCount++;
                 if (zeroCount == 1)
                     flag1 = true;
-                if (zeroCount == 3)
+                if (zeroCount == 2)
                     flag2 = true;
             }
             if(flag1){
@@ -60,11 +60,11 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
                 flag1 = false;
                 flag2 = false;
 
-            if(bytes[len] == 0 & bytes[len-1] == 0) {
+            if(bytes[len-1] == 0) {
                 zeroCount++;
                 if (zeroCount == 1)
                     flag1 = true;
-                if (zeroCount == 3)
+                if (zeroCount == 2)
                     flag2 = true;
             }
             if(flag1){
@@ -83,11 +83,11 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
             case 3: // login
                 flag1 = false;
                 flag2 = false;
-                if(bytes[len] == 0 & bytes[len-1] == 0) {
+                if(bytes[len-1] == 0) {
                     zeroCount++;
                     if (zeroCount == 1)
                         flag1 = true;
-                    if (zeroCount == 3)
+                    if (zeroCount == 2)
                         flag2 = true;
                 }
                 if(flag1){
@@ -150,7 +150,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
                 break;
             case 8: // student stat
                 flag1 = false;
-                if(bytes[len] == 0 & bytes[len-1] == 0) {
+                if(bytes[len-1] == 0) {
                     zeroCount++;
                     if (zeroCount == 1)
                         flag1 = true;
@@ -202,7 +202,63 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
 
     @Override
     public byte[] encode(String message) {
-        return (message + "\n").getBytes(); //uses utf8 by default
+        byte[] resultBytes = new byte[1<<10];
+        int curI = 0;
+        String[] mess = message.split( "\n");
+        String[] opCode = mess[0].split(" ");
+        if(opCode[0].equals("ACK")){
+            short ack = 12;
+            byte[] tempByte = shortToBytes(ack);
+            for(int i = 0 ; i < tempByte.length; i++){
+                resultBytes[curI+i] = tempByte[i];
+            }
+            curI +=tempByte.length;
+            short opCodeShort = Short.parseShort(opCode[1]);
+            tempByte = shortToBytes(opCodeShort);
+            for(int i = 0; i < tempByte.length; i++){
+                resultBytes[curI+i] = tempByte[i];
+            }
+            curI +=tempByte.length;
+            String optional = "";
+            for(int i = 0 ; i < mess.length-1 ; i++){
+                        optional+= mess[1+i];
+                        optional+= "\n";
+            }
+                    tempByte = optional.getBytes(StandardCharsets.UTF_8);
+                    for(int i= 0 ; i < tempByte.length; i++){
+                        resultBytes[curI+i] = tempByte[i];
+                    }
+                    curI += tempByte.length;
+                    resultBytes[curI] = 0;
+                    return resultBytes;
+        }
+        else if(opCode[0].equals("ERROR")){
+            short error = 13;
+            byte[] tempByte = shortToBytes(error);
+            for(int i = 0 ; i < tempByte.length; i++){
+                resultBytes[curI+i] = tempByte[i];
+            }
+            curI +=tempByte.length;
+            short opCodeShort = Short.parseShort(opCode[1]);
+            tempByte = shortToBytes(opCodeShort);
+            for(int i = 0; i < tempByte.length; i++){
+                resultBytes[curI+i] = tempByte[i];
+            }
+            curI +=tempByte.length;
+            String optional = "";
+            for(int i = 0 ; i < mess.length-1 ; i++){
+                optional+= mess[1+i];
+                optional+= "\n";
+            }
+            tempByte = optional.getBytes(StandardCharsets.UTF_8);
+            for(int i= 0 ; i < tempByte.length; i++){
+                resultBytes[curI+i] = tempByte[i];
+            }
+            curI += tempByte.length;
+            return resultBytes;
+        }
+        else
+            return null;
     }
 
     private void pushByte(byte nextByte) {
@@ -226,5 +282,12 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
         short result = (short)((byteArr[0] & 0xFF) << 8);
         result += (short)(byteArr[1] & 0xFF);
         return result;
+    }
+    public byte[] shortToBytes(short num)
+    {
+        byte[] bytesArr = new byte[2];
+        bytesArr[0] = (byte)((num >> 8) & 0xFF);
+        bytesArr[1] = (byte)(num & 0xFF);
+        return bytesArr;
     }
 }
