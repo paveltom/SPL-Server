@@ -26,7 +26,7 @@ public class Database {
 	private Database() {
 		courses = new ArrayList<>();
 		users = new ArrayList<>();
-		initialize(".Courses.txt");
+		initialize("/home/spl211/IdeaProjects/Server/Courses.txt");
 	}
 
 	/**
@@ -45,6 +45,7 @@ public class Database {
 			int courseOrdNum = 0;
 			for (String line; (line = br.readLine()) != null; ) {
 				line = line.trim();
+				if(line.equals("")) continue;
 				int iend = line.indexOf('|');
 				int cNum = Integer.parseInt(line.substring(0, iend));
 
@@ -55,7 +56,10 @@ public class Database {
 				line = line.substring(iend + 2).trim();
 				iend = line.indexOf(']');
 				String[] strKdamim = line.substring(0, iend).split(",");
-				int[] kdamim = new int[strKdamim.length];
+				int tempLength = strKdamim.length;
+				if (strKdamim.length == 1 && strKdamim[0].equals(""))
+					tempLength = 0;
+				int[] kdamim = new int[tempLength];
 				for (int i = 0; i < kdamim.length; i++)
 					kdamim[i] = Integer.parseInt(strKdamim[i].trim());
 

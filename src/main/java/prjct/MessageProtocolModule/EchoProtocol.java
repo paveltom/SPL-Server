@@ -20,29 +20,29 @@ public class EchoProtocol implements MessagingProtocol<String> {
             shouldTerminate = false;
             database = Database.getInstance();
             String output = "";
-            int indOf = 1;
-            if (msg.trim().length() > 1)
+            int indOf = 2;
+            if (msg.trim().length() > 2)
                 indOf = msg.indexOf(" ");
             currOpCode = msg.substring(0, indOf);
             msg = msg.substring(indOf).trim();
             switch (currOpCode) {
-                case "1":
+                case "01":
                     return adminreg(msg);
-                case "2":
+                case "02":
                     return studentreg(msg);
-                case "3":
+                case "03":
                     return login(msg);
-                case "4":
+                case "04":
                     return logout();
-                case "5":
+                case "05":
                     return coursereg(msg);
-                case "6":
+                case "06":
                     return kdamcheck(msg);
-                case "7":
+                case "07":
                     return coursestat(msg);
-                case "8":
+                case "08":
                     return studentstat(msg);
-                case "9":
+                case "09":
                     return isregistered(msg);
                 case "10":
                     return unregister(msg);

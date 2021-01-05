@@ -17,18 +17,19 @@ public class startServer {
         //STUDENTSTAT Morty
         //COURSESTAT 32
         //LOGOUT
+        System.out.println("Present Project Directory : "+ System.getProperty("user.dir")+"/Courses.txt");
         EchoProtocol echo = new EchoProtocol();
-        System.out.println(echo.process("2 Morty a123"));
-        System.out.println(echo.process("3 Morty a123"));
-        System.out.println(echo.process("5 530"));
-        System.out.println(echo.process("4"));
-        System.out.println(echo.process("1 Morty a123"));
-        System.out.println(echo.process("1 Rick a123"));
-        System.out.println(echo.process("3 Rick a123"));
-        System.out.println(echo.process("8 Morty"));
-        System.out.println(echo.process("7 32"));
-        System.out.println(echo.process("7 342"));
-        System.out.println(echo.process("4"));
+        System.out.println(echo.process("02 Morty a123"));
+        System.out.println(echo.process("03 Morty a123"));
+        System.out.println(echo.process("05 530"));
+        System.out.println(echo.process("04"));
+        System.out.println(echo.process("01 Morty a123"));
+        System.out.println(echo.process("01 Rick a123"));
+        System.out.println(echo.process("03 Rick a123"));
+        System.out.println(echo.process("08 Morty"));
+        System.out.println(echo.process("07 32"));
+        System.out.println(echo.process("07 342"));
+        System.out.println(echo.process("04"));
 
 
 

@@ -1,5 +1,6 @@
 package prjct;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class Course {
@@ -61,6 +62,6 @@ public class Course {
     }
 
     public String toString(){
-        throw new UnsupportedOperationException();
+        return num + "|" + name + "|" + Arrays.toString(kdamim) + "|" + maxStudsNum;
     }
 }
