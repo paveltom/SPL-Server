@@ -5,6 +5,7 @@ import prjct.Database;
 import prjct.User;
 
 import java.util.*;
+import java.util.concurrent.BlockingQueue;
 import java.util.stream.Collectors;
 
 public class EchoProtocol implements MessagingProtocol<String> {
@@ -123,15 +124,18 @@ public class EchoProtocol implements MessagingProtocol<String> {
         Course course = database.getCourseByNum(Integer.parseInt(msg.trim()));
         if (course == null)
             return "ERROR " + currOpCode + "\n" + "(There is no such course...)\n";
-        List<Course> userKdamim = currUser.getCourses();
+        BlockingQueue<Course> userKdamim = currUser.getCourses();
         int[] courseKdamim = course.getKdamim();
         if (courseKdamim.length != 0) {
             if (userKdamim.isEmpty())
                 return "ERROR " + currOpCode + "\n" + "( " + currUser.getUsername() + " does not have all the required KDAMIM...)\n";
             else {
-                for (int i = 0; i < courseKdamim.length; i++)
-                    if (!userKdamim.contains(courseKdamim[i]))
+                for (int i = 0; i < courseKdamim.length; i++) {
+                    //if (!userKdamim.contains(courseKdamim[i]))
+                    int ind = i;
+                    if (!(userKdamim.stream().anyMatch(cour -> cour.getNum() == courseKdamim[ind])))
                         return "ERROR " + currOpCode + "\n" + "( " + currUser.getUsername() + " does not have all the required KDAMIM...)\n";
+                }
             }
         }
         if (course.getMaxStudsNum() == course.getCurrStudsNum())

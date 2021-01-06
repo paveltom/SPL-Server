@@ -3,18 +3,21 @@ package prjct;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class User {
 
     private String username;
     private String password;
-    List<Course> courses;
+    BlockingQueue<Course> courses;
     private boolean adminIndctr;
 
     public User (String username, String password, boolean isAdmin ){
         this.username = username;
         this.password = password;
-        this.courses = new ArrayList<Course>();
+        this.courses = new LinkedBlockingQueue<Course>();
         this.adminIndctr = isAdmin;
     }
 
@@ -22,7 +25,7 @@ public class User {
         return username;
     }
 
-    public List<Course> getCourses() {
+    public BlockingQueue<Course> getCourses() {
         return courses;
     }
 
@@ -50,17 +53,30 @@ public class User {
     }
 
     public void addCourse(Course c){
-        int insrtIndex = 0;
+        //int insrtIndex = 0;
         if(courses.size() > 0) {
+            BlockingQueue<Course> tempList = new LinkedBlockingQueue<>();
             Iterator<Course> itr = courses.iterator();
             Course tempCourse = itr.next();
             while (tempCourse != null && c.getOrderNum() > tempCourse.getOrderNum()) {
-                insrtIndex++;
                 tempCourse = itr.next();
+                try {
+                    tempList.put(courses.take());
+                } catch (Exception e){
+                    System.out.println(e.getMessage());
+                    continue;}
+                //insrtIndex++;
                 if (tempCourse != null && c.getOrderNum() < tempCourse.getOrderNum())
                     break;
             }
+            try {
+                tempList.put(c);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+            tempList.addAll(courses);
+            courses = new LinkedBlockingQueue<>(tempList);
         }
-        courses.add(insrtIndex, c);
+        else courses.add(c);
     }
 }
