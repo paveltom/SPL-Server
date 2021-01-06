@@ -1,5 +1,8 @@
 import prjct.MessageProtocolModule.EchoProtocol;
 import prjct.MessageProtocolModule.LineMessageEncoderDecoder;
+import prjct.ServerModule.BaseServer;
+import prjct.ServerModule.BlockingConnectionHandler;
+import prjct.ServerModule.Reactor;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -10,6 +13,8 @@ public class startServer {
 
 //        byte[] bytes = new byte[1 << 10]
 //        String result = new String(, 0, len, StandardCharsets.UTF_8);
+        Reactor baseServer = new Reactor<String>(1, 7777, () -> new EchoProtocol(), () -> new LineMessageEncoderDecoder());
+        baseServer.serve();
 
 
         //STUDENTREG Morty a123
@@ -17,20 +22,20 @@ public class startServer {
         //STUDENTSTAT Morty
         //COURSESTAT 32
         //LOGOUT
-        System.out.println("Present Project Directory : "+ System.getProperty("user.dir")+"/Courses.txt");
-        EchoProtocol echo = new EchoProtocol();
-        System.out.println(echo.process("02 Morty a123"));
-        System.out.println(echo.process("03 Morty a123"));
-        System.out.println(echo.process("05 530"));
-        System.out.println(echo.process("04"));
-        System.out.println(echo.process("01 Morty a123"));
-        System.out.println(echo.process("01 Rick a123"));
-        System.out.println(echo.process("03 Rick a123"));
-        System.out.println(echo.process("08 Morty"));
-        System.out.println(echo.process("07 32"));
-        System.out.println(echo.process("07 342"));
-        System.out.println(echo.process("07 530"));
-        System.out.println(echo.process("04"));
+//        System.out.println("Present Project Directory : "+ System.getProperty("user.dir")+"/Courses.txt");
+//        EchoProtocol echo = new EchoProtocol();
+//        System.out.println(echo.process("02 Morty a123"));
+//        System.out.println(echo.process("03 Morty a123"));
+//        System.out.println(echo.process("05 530"));
+//        System.out.println(echo.process("04"));
+//        System.out.println(echo.process("01 Morty a123"));
+//        System.out.println(echo.process("01 Rick a123"));
+//        System.out.println(echo.process("03 Rick a123"));
+//        System.out.println(echo.process("08 Morty"));
+//        System.out.println(echo.process("07 32"));
+//        System.out.println(echo.process("07 342"));
+//        System.out.println(echo.process("07 530"));
+//        System.out.println(echo.process("04"));
 
 
 

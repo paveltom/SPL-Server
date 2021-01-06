@@ -51,7 +51,7 @@ public class EchoProtocol implements MessagingProtocol<String> {
             }
             return output;
         } catch (Exception e) {
-            return "ERROR " + currOpCode + "\n(" + e.getMessage() + ")\n";
+            return "ERROR: " + "\n(" + e.getMessage() + ")\n";
         }
     }
 
