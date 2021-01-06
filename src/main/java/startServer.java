@@ -31,6 +31,7 @@ public class startServer {
         System.out.println(echo.process("05 912"));
         System.out.println(echo.process("05 482"));
         System.out.println(echo.process("04"));
+        //912, 482, 530 need to be displayed in Morty's courses
         System.out.println(echo.process("01 Morty a123"));
         System.out.println(echo.process("01 Rick a123"));
         System.out.println(echo.process("03 Rick a123"));
