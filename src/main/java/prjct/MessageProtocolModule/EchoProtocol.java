@@ -17,6 +17,7 @@ public class EchoProtocol implements MessagingProtocol<String> {
 
     @Override
     public String process(String msg) {
+        System.out.println("EchoProtocol: accepted message: " + msg);
         try {
             System.out.println( "EchoProtocol: process: " + msg);
             shouldTerminate = false;
