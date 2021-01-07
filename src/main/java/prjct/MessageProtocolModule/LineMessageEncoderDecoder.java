@@ -20,6 +20,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
         //notice that the top 128 ascii characters have the same representation as their utf-8 counterparts
         //this allow us to do the following comparison
         if (len == 2){
+            result = "";
             op = bytesToShort(bytes);
             if(op<10)
             result += "0" + op + " ";
@@ -44,7 +45,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
                     flag2 = true;
             }
             if(flag1){
-                result += (popString(startFrom,len-1)+" ");
+                result += (popString(startFrom,len-2)+" ");
                 startFrom = len;
                 flag1 = false;
             }
@@ -84,7 +85,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
             case 3: // login
                 flag1 = false;
                 flag2 = false;
-                if(bytes[len-1] == 0) {
+                if(len > 0 && bytes[len-1] == 0) {
                     zeroCount++;
                     if (zeroCount == 1)
                         flag1 = true;
@@ -205,59 +206,70 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
 
     @Override
     public byte[] encode(String message) {
-        byte[] resultBytes = new byte[1<<10];
+
         int curI = 0;
         String[] mess = message.split( "\n");
         String[] opCode = mess[0].split(" ");
-        if(opCode[0].equals("ACK")){
+        if(opCode[0].equals("ACK")) {
             short ack = 12;
-            byte[] tempByte = shortToBytes(ack);
-            for(int i = 0 ; i < tempByte.length; i++){
-                resultBytes[curI+i] = tempByte[i];
-            }
-            curI +=tempByte.length;
+            byte[] ackCode = shortToBytes(ack);
+
             short opCodeShort = Short.parseShort(opCode[1]);
-            tempByte = shortToBytes(opCodeShort);
-            for(int i = 0; i < tempByte.length; i++){
-                resultBytes[curI+i] = tempByte[i];
-            }
-            curI +=tempByte.length;
+            byte[] msgOp = shortToBytes(opCodeShort);
+
             String optional = "";
-            for(int i = 0 ; i < mess.length-1 ; i++){
-                        optional+= mess[1+i];
-                        optional+= "\n";
+            for (int i = 0; i < mess.length - 1; i++) {
+                optional += mess[1 + i];
+                optional += "\n";
             }
-                    tempByte = optional.getBytes(StandardCharsets.UTF_8);
-                    for(int i= 0 ; i < tempByte.length; i++){
-                        resultBytes[curI+i] = tempByte[i];
-                    }
-                    curI += tempByte.length;
-                    resultBytes[curI] = '\0';
-                    return resultBytes;
+            byte[] optionalBytes = optional.getBytes(StandardCharsets.UTF_8);
+
+            byte[] resultBytes = new byte[ackCode.length+msgOp.length+optionalBytes.length+1];
+            for (int i = 0; i < ackCode.length; i++) {
+                resultBytes[curI + i] = ackCode[i];
+            }
+            curI += ackCode.length;
+            for (int i = 0; i < msgOp.length; i++) {
+                resultBytes[curI + i] = msgOp[i];
+            }
+            curI += msgOp.length;
+            for (int i = 0; i < optionalBytes.length; i++) {
+                resultBytes[curI + i] = optionalBytes[i];
+            }
+            curI += optionalBytes.length;
+
+            resultBytes[curI] = '\0';
+            return resultBytes;
         }
         else if(opCode[0].equals("ERROR")){
             short error = 13;
-            byte[] tempByte = shortToBytes(error);
-            for(int i = 0 ; i < tempByte.length; i++){
-                resultBytes[curI+i] = tempByte[i];
-            }
-            curI +=tempByte.length;
+            byte[] ackCode = shortToBytes(error);
+
             short opCodeShort = Short.parseShort(opCode[1]);
-            tempByte = shortToBytes(opCodeShort);
-            for(int i = 0; i < tempByte.length; i++){
-                resultBytes[curI+i] = tempByte[i];
-            }
-            curI +=tempByte.length;
+            byte[] msgOp = shortToBytes(opCodeShort);
+
             String optional = "";
-            for(int i = 0 ; i < mess.length-1 ; i++){
-                optional+= mess[1+i];
-                optional+= "\n";
+            for (int i = 0; i < mess.length - 1; i++) {
+                optional += mess[1 + i];
+                optional += "\n";
             }
-            tempByte = optional.getBytes(StandardCharsets.UTF_8);
-            for(int i= 0 ; i < tempByte.length; i++){
-                resultBytes[curI+i] = tempByte[i];
+            byte[] optionalBytes = optional.getBytes(StandardCharsets.UTF_8);
+
+            byte[] resultBytes = new byte[ackCode.length+msgOp.length+optionalBytes.length+1];
+            for (int i = 0; i < ackCode.length; i++) {
+                resultBytes[curI + i] = ackCode[i];
             }
-            curI += tempByte.length;
+            curI += ackCode.length;
+            for (int i = 0; i < msgOp.length; i++) {
+                resultBytes[curI + i] = msgOp[i];
+            }
+            curI += msgOp.length;
+            for (int i = 0; i < optionalBytes.length; i++) {
+                resultBytes[curI + i] = optionalBytes[i];
+            }
+            curI += optionalBytes.length;
+
+            resultBytes[curI] = '\0';
             return resultBytes;
         }
         else
@@ -275,9 +287,9 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
     public String popString(int startFrom , int end) { //change to private!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         //notice that we explicitly requesting that the string will be decoded from UTF-8
         //this is not actually required as it is the default encoding in java.
-        String curResult = new String(bytes, startFrom, end, StandardCharsets.UTF_8);
+        return new String(bytes, startFrom, end, StandardCharsets.UTF_8);
         //len = 0;
-        return curResult;
+        //return curResult;
     }
 
     public short bytesToShort(byte[] byteArr)
