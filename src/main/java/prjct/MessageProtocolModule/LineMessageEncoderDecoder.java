@@ -53,6 +53,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
                 len = 0;
                 zeroCount = 0;
                 startFrom = 0;
+                op = 0;
                 return result;
             }
             break;
@@ -231,7 +232,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
                         resultBytes[curI+i] = tempByte[i];
                     }
                     curI += tempByte.length;
-                    resultBytes[curI] = 0;
+                    resultBytes[curI] = '\0';
                     return resultBytes;
         }
         else if(opCode[0].equals("ERROR")){

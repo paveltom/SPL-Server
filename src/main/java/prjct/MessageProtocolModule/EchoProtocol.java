@@ -51,12 +51,12 @@ public class EchoProtocol implements MessagingProtocol<String> {
                 case "11":
                     return mycourses();
                 default:
-                    return "ERROR: No such command...";
+                    return "ERROR No such command...";
             }
             //System.out.println("EchoProtocol: process output: " + output);
             //return output;
         } catch (Exception e) {
-            return "ERROR: " + "\n(" + e.getMessage() + ")\n";
+            return "ERROR " + "\n(" + e.getMessage() + ")\n";
         }
     }
 
