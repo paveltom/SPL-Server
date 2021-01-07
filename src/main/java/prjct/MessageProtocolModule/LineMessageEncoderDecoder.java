@@ -194,6 +194,8 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
                 startFrom = 0;
                 return result;
             default:
+                if (len == 2)
+                    return "ERROR: No such command...";
                break;
         }
         pushByte(nextByte);
