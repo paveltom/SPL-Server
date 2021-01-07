@@ -3,6 +3,7 @@ import prjct.MessageProtocolModule.LineMessageEncoderDecoder;
 import prjct.ServerModule.BaseServer;
 import prjct.ServerModule.BlockingConnectionHandler;
 import prjct.ServerModule.Reactor;
+import prjct.ServerModule.TPCServer;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -16,6 +17,8 @@ public class startServer {
 //        Reactor baseServer = new Reactor<String>(1, 7777, () -> new EchoProtocol(), () -> new LineMessageEncoderDecoder());
 //        baseServer.serve();
 
+        TPCServer tpcServer = new TPCServer(7777, () -> new EchoProtocol(), () -> new LineMessageEncoderDecoder());
+        tpcServer.serve();
 
         //STUDENTREG Morty a123
         //LOGIN Morty a123
@@ -24,24 +27,25 @@ public class startServer {
         //LOGOUT
 //        System.out.println("Present Project Directory : "+ System.getProperty("user.dir")+"/Courses.txt");
         //530->912->482
-        EchoProtocol echo = new EchoProtocol();
-        System.out.println(echo.process("02 Morty a123"));
-        System.out.println(echo.process("03 Morty a123"));
-        System.out.println(echo.process("05 530"));
-        System.out.println(echo.process("05 912"));
-        System.out.println(echo.process("05 482"));
-        System.out.println(echo.process("04"));
-        //912, 482, 530 need to be displayed in Morty's courses
-        System.out.println(echo.process("01 Morty a123"));
-        System.out.println(echo.process("01 Rick a123"));
-        System.out.println(echo.process("03 Rick a123"));
-        System.out.println(echo.process("08 Morty"));
-        System.out.println(echo.process("07 32"));
-        System.out.println(echo.process("07 342"));
-        System.out.println(echo.process("07 530"));
-        System.out.println(echo.process("07 912"));
-        System.out.println(echo.process("07 482"));
-        System.out.println(echo.process("04"));
+
+//        EchoProtocol echo = new EchoProtocol();
+//        System.out.println(echo.process("02 Morty a123"));
+//        System.out.println(echo.process("03 Morty a123"));
+//        System.out.println(echo.process("05 530"));
+//        System.out.println(echo.process("05 912"));
+//        System.out.println(echo.process("05 482"));
+//        System.out.println(echo.process("04"));
+//        //912, 482, 530 need to be displayed in Morty's courses
+//        System.out.println(echo.process("01 Morty a123"));
+//        System.out.println(echo.process("01 Rick a123"));
+//        System.out.println(echo.process("03 Rick a123"));
+//        System.out.println(echo.process("08 Morty"));
+//        System.out.println(echo.process("07 32"));
+//        System.out.println(echo.process("07 342"));
+//        System.out.println(echo.process("07 530"));
+//        System.out.println(echo.process("07 912"));
+//        System.out.println(echo.process("07 482"));
+//        System.out.println(echo.process("04"));
 
 
 
