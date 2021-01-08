@@ -224,7 +224,6 @@ public class EchoProtocol implements MessagingProtocol<String> {
     private String mycourses() {
         if (currUser == null)
             return "ERROR " + currOpCode + "\n" + "(You need to login in order to perform actions...)\n";
-        return currUser.coursesToString();
+        return "ACK " + currOpCode + "\n" + currUser.coursesToString();
     }
-
 }

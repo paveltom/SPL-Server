@@ -35,7 +35,7 @@ public class User {
             output = output + c.getNum() + ",";
         }
         output = output.substring(0, (output.length()-1));
-        output = output + "]";
+        output = output.concat("]");
         return output;
     }
 
