@@ -42,32 +42,54 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
 
         switch (op) {
             case 1: // Admin register
+                flag1 = false;
+                flag2 = false;
+                if (nextByte == 0) {
+                    zeroCount++;
+                    if (zeroCount == 1)
+                        flag1 = true;
+                    if (zeroCount == 2)
+                        flag2 = true;
+                }
+                if (flag1) {
+                    result += (popString(startFrom, len - 1) + " ");
+                    startFrom = len;
+                    flag1 = false;
+                }
+                if (flag2) {
+                    result += (popString(startFrom, len - 1) + " ");
+                    len = 0;
+                    zeroCount = 0;
+                    startFrom = 0;
+                    op = 0;
+                    return result;
+                }
+                break;
             case 2: // student register
             case 3: // LOGIN
                 flag1 = false;
-            flag2 = false;
-
-            if(nextByte == 0) {
-                zeroCount++;
-                if (zeroCount == 1)
-                    flag1 = true;
-                if (zeroCount == 2)
-                    flag2 = true;
-            }
-            if(flag1){
-                result += (popString(startFrom,len-1)+" ");
-                startFrom = len;
-                flag1 = false;
-            }
-            if(flag2) {
-                result += (popString(startFrom, len - 1) + " ");
-                len = 0;
-                zeroCount = 0;
-                startFrom = 0;
-                op = 0;
-                return result;
-            }
-            break;
+                flag2 = false;
+                if (nextByte == 0) {
+                    zeroCount++;
+                    if (zeroCount == 1)
+                        flag1 = true;
+                    if (zeroCount == 2)
+                        flag2 = true;
+                }
+                if (flag1) {
+                    result += (popString(startFrom, len - 1) + " ");
+                    startFrom = len;
+                    flag1 = false;
+                }
+                if (flag2) {
+                    result += (popString(startFrom, len - 1) + " ");
+                    len = 0;
+                    zeroCount = 0;
+                    startFrom = 0;
+                    op = 0;
+                    return result;
+                }
+                break;
 
             case 4: // logout
             case 11: // my courses
@@ -81,27 +103,28 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
             case 7: // course stat
             case 9: // is registered
             case 10: // unregister
-                if(len == 4){
-                    byte[] tempBytes = new byte[1<<3];
+                if (len == 4) {
+                    byte[] tempBytes = new byte[1 << 3];
 
                     tempBytes[0] = bytes[2];
                     tempBytes[1] = bytes[3];
                     short num = bytesToShort(tempBytes);
-                    result+= (""+num);
+                    result += ("" + num);
                     len = 0;
                     startFrom = 0;
                     op = 0;
                     return result;
                 }
+                break;
 
             case 8: // student stat
                 flag1 = false;
-                if(nextByte == 0) {
+                if (nextByte == 0) {
                     zeroCount++;
                     if (zeroCount == 1)
                         flag1 = true;
                 }
-                if(flag1) {
+                if (flag1) {
                     result += (popString(startFrom, len - 1) + " ");
                     len = 0;
                     zeroCount = 0;
@@ -116,7 +139,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
                     len = 0;
                     return "ERROR: No such command...";
                 }
-               break;
+                break;
         }
         pushByte(nextByte);
         return null; //not a line yet
@@ -124,7 +147,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
 
     @Override
     public byte[] encode(String message) {
-        System.out.println(message);
+        //System.out.println(message);
         if (len == 0)
             result = "";
         int curI = 0;
@@ -144,13 +167,13 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
             }
             byte[] optionalBytes = optional.getBytes(StandardCharsets.UTF_8);
 
-            byte[] resultBytes = new byte[ackCode.length+msgOp.length+optionalBytes.length+2];
+            byte[] resultBytes = new byte[ackCode.length+msgOp.length+optionalBytes.length+1];
             for (int i = 0; i < ackCode.length; i++) {
                 resultBytes[curI + i] = ackCode[i];
             }
             curI += ackCode.length;
-            resultBytes[curI] = ' ';
-            curI++;
+//            resultBytes[curI] = ' ';
+//            curI++;
 
             for (int i = 0; i < msgOp.length; i++) {
                 resultBytes[curI + i] = msgOp[i];
@@ -162,6 +185,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
             curI += optionalBytes.length;
 
             resultBytes[curI] = '\0';
+            System.out.println(Arrays.toString(resultBytes));
             return resultBytes;
         }
         else if(opCode[0].equals("ERROR")){
@@ -178,13 +202,13 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
             }
             byte[] optionalBytes = optional.getBytes(StandardCharsets.UTF_8);
 
-            byte[] resultBytes = new byte[ackCode.length+msgOp.length+optionalBytes.length+2];
+            byte[] resultBytes = new byte[ackCode.length+msgOp.length+optionalBytes.length+1];
             for (int i = 0; i < ackCode.length; i++) {
                 resultBytes[curI + i] = ackCode[i];
             }
             curI += ackCode.length;
-            resultBytes[curI] = ' ';
-            curI++;
+//            resultBytes[curI] = ' ';
+//            curI++;
 
             for (int i = 0; i < msgOp.length; i++) {
                 resultBytes[curI + i] = msgOp[i];
@@ -196,6 +220,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
             curI += optionalBytes.length;
 
             resultBytes[curI] = '\0';
+            System.out.println( Arrays.toString(resultBytes));
             return resultBytes;
         }
         else
