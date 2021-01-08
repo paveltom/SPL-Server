@@ -218,6 +218,7 @@ public class EchoProtocol implements MessagingProtocol<String> {
         if (!currUser.getCourses().contains(course))
             return "ERROR " + currOpCode + "\n" + "(" + currUser.getUsername() + " is not registered to this course...)\n";
         currUser.unregisterCourse(course);
+        course.removeStudent();
         return "ACK " + currOpCode + "\n";
     }
 

@@ -14,11 +14,11 @@ public class startServer {
 
 //        byte[] bytes = new byte[1 << 10]
 //        String result = new String(, 0, len, StandardCharsets.UTF_8);
-//        Reactor baseServer = new Reactor<String>(1, 7777, () -> new EchoProtocol(), () -> new LineMessageEncoderDecoder());
-//        baseServer.serve();
+        Reactor baseServer = new Reactor<String>(1, 7777, () -> new EchoProtocol(), () -> new LineMessageEncoderDecoder());
+        baseServer.serve();
 
-        TPCServer tpcServer = new TPCServer(7777, () -> new EchoProtocol(), () -> new LineMessageEncoderDecoder());
-        tpcServer.serve();
+//        TPCServer tpcServer = new TPCServer(7777, () -> new EchoProtocol(), () -> new LineMessageEncoderDecoder());
+//        tpcServer.serve();
 
         //STUDENTREG Morty a123
         //LOGIN Morty a123

@@ -27,6 +27,14 @@ public class Course {
         return true;
     }
 
+    public boolean removeStudent() {
+        if (currStudsNum == 0)
+            return false;
+        currStudsNum--;
+        return true;
+    }
+
+
     public int getNum() {
         return num;
     }
