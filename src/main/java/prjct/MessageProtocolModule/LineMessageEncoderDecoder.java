@@ -62,6 +62,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
                     zeroCount = 0;
                     startFrom = 0;
                     op = 0;
+                    bytes = new byte[1<<10];
                     return result;
                 }
                 break;
@@ -87,6 +88,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
                     zeroCount = 0;
                     startFrom = 0;
                     op = 0;
+                    bytes = new byte[1<<10];
                     return result;
                 }
                 break;
@@ -96,6 +98,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
                 len = 0;
                 startFrom = 0;
                 op = 0;
+                bytes = new byte[1<<10];
                 return result;
 
             case 5: // register to course
@@ -113,6 +116,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
                     len = 0;
                     startFrom = 0;
                     op = 0;
+                    bytes = new byte[1<<10];
                     return result;
                 }
                 break;
@@ -130,6 +134,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
                     zeroCount = 0;
                     startFrom = 0;
                     op = 0;
+                    bytes = new byte[1<<10];
                     return result;
                 }
                 break;
@@ -137,6 +142,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
             default:
                 if (len == 2) {
                     len = 0;
+                    bytes = new byte[1<<10];
                     return "ERROR: No such command...";
                 }
                 break;
