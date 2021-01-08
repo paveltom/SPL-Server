@@ -1,14 +1,7 @@
-41|Advance Swordsmanship|[42]|5
-
-46|Swordsmanship for Heros|[42,41]|2
-
-44|Swordsmanship: From Hero to King|[46,41,42]|1
-
-42|Intermediate Swordsmanship|[]|25
-
-43|How to Train Your Dragon|[41,46,44,42]|25
-
-
-
-
-
+2713|edfbc0f9|[3169]|9
+3169|cc0297e3|[2407]|5
+3174|7ae8086d|[]|8
+2291|1c707303|[2407]|6
+2407|dce70152|[]|7
+2287|966accab|[3174]|6
+1834|efd4219a|[]|12
