@@ -10,7 +10,7 @@ public class TPCMain {
 
     public static void main(String[] args) throws IOException {
 
-        TPCServer tpcServer = new TPCServer(7777, () -> new EchoProtocol(), () -> new LineMessageEncoderDecoder());
+        TPCServer tpcServer = new TPCServer(Integer.parseInt(args[0]), () -> new EchoProtocol(), () -> new LineMessageEncoderDecoder());
         tpcServer.serve();
     }
 }
