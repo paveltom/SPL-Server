@@ -1,0 +1,4 @@
+./CommandProcessor.java
+./RunClientTests.java
+./Tests.java
+./StreamReader.java
