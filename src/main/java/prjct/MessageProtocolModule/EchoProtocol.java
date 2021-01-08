@@ -17,9 +17,9 @@ public class EchoProtocol implements MessagingProtocol<String> {
 
     @Override
     public String process(String msg) {
-        System.out.println("EchoProtocol: accepted message: " + msg);
+        //System.out.println("EchoProtocol: accepted message: " + msg);
         try {
-            System.out.println( "EchoProtocol: process: " + msg);
+            //System.out.println( "EchoProtocol: process: " + msg);
             shouldTerminate = false;
             database = Database.getInstance();
             //String output = "";
@@ -52,12 +52,12 @@ public class EchoProtocol implements MessagingProtocol<String> {
                 case "11":
                     return mycourses();
                 default:
-                    return "ERROR No such command...";
+                    return "ERROR 13 No such command...";
             }
             //System.out.println("EchoProtocol: process output: " + output);
             //return output;
         } catch (Exception e) {
-            return "ERROR " + "\n(" + e.getMessage() + ")\n";
+            return "Exception: " + "\n(" + e.getMessage() + ")\n";
         }
     }
 

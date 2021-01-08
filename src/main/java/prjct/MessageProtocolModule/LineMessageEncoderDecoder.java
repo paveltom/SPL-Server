@@ -19,6 +19,14 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
     public String decodeNextByte(byte nextByte) {
         //notice that the top 128 ascii characters have the same representation as their utf-8 counterparts
         //this allow us to do the following comparison
+        if (len == 0) {
+            result = "";
+            op = 0;
+            startFrom = 0;
+            zeroCount = 0;
+            flag1 = false;
+            flag2 = false;
+        }
         if (len == 2){
             result = "";
             op = bytesToShort(bytes);
@@ -34,10 +42,12 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
 
         switch (op) {
             case 1: // Admin register
-            flag1 = false;
+            case 2: // student register
+            case 3: // LOGIN
+                flag1 = false;
             flag2 = false;
 
-            if(bytes[len-1] == 0) {
+            if(nextByte == 0) {
                 zeroCount++;
                 if (zeroCount == 1)
                     flag1 = true;
@@ -45,12 +55,12 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
                     flag2 = true;
             }
             if(flag1){
-                result += (popString(startFrom,len-2)+" ");
+                result += (popString(startFrom,len-1)+" ");
                 startFrom = len;
                 flag1 = false;
             }
-            if(flag2){
-                result += (popString(startFrom,len-1)+" ");
+            if(flag2) {
+                result += (popString(startFrom, len - 1) + " ");
                 len = 0;
                 zeroCount = 0;
                 startFrom = 0;
@@ -58,126 +68,18 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
                 return result;
             }
             break;
-            case 2: // student register
-                flag1 = false;
-                flag2 = false;
 
-            if(bytes[len-1] == 0) {
-                zeroCount++;
-                if (zeroCount == 1)
-                    flag1 = true;
-                if (zeroCount == 2)
-                    flag2 = true;
-            }
-            if(flag1){
-                result += (popString(startFrom,len-1)+" ");
-                startFrom = len;
-                flag1 = false;
-            }
-            if(flag2){
-                result += (popString(startFrom,len-1)+" ");
-                len = 0;
-                zeroCount = 0;
-                startFrom = 0;
-                return result;
-            }
-            break;
-            case 3: // login
-                flag1 = false;
-                flag2 = false;
-                if(len > 0 && bytes[len-1] == 0) {
-                    zeroCount++;
-                    if (zeroCount == 1)
-                        flag1 = true;
-                    if (zeroCount == 2)
-                        flag2 = true;
-                }
-                if(flag1){
-                    result += (popString(startFrom,len-1)+" ");
-                    startFrom = len;
-                    flag1 = false;
-                }
-                if(flag2){
-                    result += (popString(startFrom,len-1)+" ");
-                    len = 0;
-                    zeroCount = 0;
-                    startFrom = 0;
-                    return result;
-                }
-                break;
             case 4: // logout
+            case 11: // my courses
                 len = 0;
                 startFrom = 0;
+                op = 0;
                 return result;
+
             case 5: // register to course
-                if(len == 4){
-                    byte[] tempBytes = new byte[1<<3];
-
-                    tempBytes[0] = bytes[2];
-                    tempBytes[1] = bytes[3];
-                    short num = bytesToShort(tempBytes);
-                    result+= (""+num);
-                    len = 0;
-                    startFrom = 0;
-                    return result;
-                }
-                break;
-//                pushByte(nextByte);
-//                return null;
             case 6: // kdam cheks
-            if(len == 4){
-                byte[] tempBytes = new byte[1<<3];
-
-                tempBytes[0] = bytes[2];
-                tempBytes[1] = bytes[3];
-                short num = bytesToShort(tempBytes);
-                result+= (""+num);
-                len = 0;
-                startFrom = 0;
-                return result;
-            }
-            break;
             case 7: // course stat
-                if(len == 4){
-                    byte[] tempBytes = new byte[1<<3];
-
-                    tempBytes[0] = bytes[2];
-                    tempBytes[1] = bytes[3];
-                    short num = bytesToShort(tempBytes);
-                    result+= (""+num);
-                    len = 0;
-                    startFrom = 0;
-                    return result;
-                }
-                break;
-            case 8: // student stat
-                flag1 = false;
-                if(bytes[len-1] == 0) {
-                    zeroCount++;
-                    if (zeroCount == 1)
-                        flag1 = true;
-                }
-                if(flag1){
-                    result += (popString(startFrom,len-1)+" ");
-                    len = 0;
-                    zeroCount = 0;
-                    startFrom = 0;
-                    return result;
-                }
-                break;
-            case 9: // is register
-                if(len == 4){
-                    byte[] tempBytes = new byte[1<<3];
-
-                    tempBytes[0] = bytes[2];
-                    tempBytes[1] = bytes[3];
-                    short num = bytesToShort(tempBytes);
-                    result+= (""+num);
-                    len = 0;
-                    startFrom = 0;
-                    return result;
-                }
-                break;
+            case 9: // is registered
             case 10: // unregister
                 if(len == 4){
                     byte[] tempBytes = new byte[1<<3];
@@ -188,16 +90,32 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
                     result+= (""+num);
                     len = 0;
                     startFrom = 0;
+                    op = 0;
+                    return result;
+                }
+
+            case 8: // student stat
+                flag1 = false;
+                if(nextByte == 0) {
+                    zeroCount++;
+                    if (zeroCount == 1)
+                        flag1 = true;
+                }
+                if(flag1) {
+                    result += (popString(startFrom, len - 1) + " ");
+                    len = 0;
+                    zeroCount = 0;
+                    startFrom = 0;
+                    op = 0;
                     return result;
                 }
                 break;
-            case 11:
-                len = 0;
-                startFrom = 0;
-                return result;
+
             default:
-                if (len == 2)
+                if (len == 2) {
+                    len = 0;
                     return "ERROR: No such command...";
+                }
                break;
         }
         pushByte(nextByte);
@@ -206,7 +124,9 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
 
     @Override
     public byte[] encode(String message) {
-
+        System.out.println(message);
+        if (len == 0)
+            result = "";
         int curI = 0;
         String[] mess = message.split( "\n");
         String[] opCode = mess[0].split(" ");
@@ -217,18 +137,21 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
             short opCodeShort = Short.parseShort(opCode[1]);
             byte[] msgOp = shortToBytes(opCodeShort);
 
-            String optional = "";
+            String optional = "\n";
             for (int i = 0; i < mess.length - 1; i++) {
                 optional += mess[1 + i];
                 optional += "\n";
             }
             byte[] optionalBytes = optional.getBytes(StandardCharsets.UTF_8);
 
-            byte[] resultBytes = new byte[ackCode.length+msgOp.length+optionalBytes.length+1];
+            byte[] resultBytes = new byte[ackCode.length+msgOp.length+optionalBytes.length+2];
             for (int i = 0; i < ackCode.length; i++) {
                 resultBytes[curI + i] = ackCode[i];
             }
             curI += ackCode.length;
+            resultBytes[curI] = ' ';
+            curI++;
+
             for (int i = 0; i < msgOp.length; i++) {
                 resultBytes[curI + i] = msgOp[i];
             }
@@ -248,18 +171,21 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
             short opCodeShort = Short.parseShort(opCode[1]);
             byte[] msgOp = shortToBytes(opCodeShort);
 
-            String optional = "";
+            String optional = "\n";
             for (int i = 0; i < mess.length - 1; i++) {
                 optional += mess[1 + i];
                 optional += "\n";
             }
             byte[] optionalBytes = optional.getBytes(StandardCharsets.UTF_8);
 
-            byte[] resultBytes = new byte[ackCode.length+msgOp.length+optionalBytes.length+1];
+            byte[] resultBytes = new byte[ackCode.length+msgOp.length+optionalBytes.length+2];
             for (int i = 0; i < ackCode.length; i++) {
                 resultBytes[curI + i] = ackCode[i];
             }
             curI += ackCode.length;
+            resultBytes[curI] = ' ';
+            curI++;
+
             for (int i = 0; i < msgOp.length; i++) {
                 resultBytes[curI + i] = msgOp[i];
             }
