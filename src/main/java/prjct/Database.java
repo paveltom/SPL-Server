@@ -19,6 +19,9 @@ public class Database {
 
 	private BlockingQueue<Course> courses;
 	private BlockingQueue<User> users;
+	private BlockingQueue<User> loggedInUsers;
+	private Object loginKey;
+	private Object regKey;
 
 	private static class SingletonHolder{
 		private static Database instance = new Database();
@@ -28,6 +31,9 @@ public class Database {
 	private Database() {
 		courses = new LinkedBlockingQueue<>();
 		users = new LinkedBlockingQueue<>();
+		loggedInUsers = new LinkedBlockingQueue<>();
+		loginKey = new Object();
+		regKey = new Object();
 		initialize("./Courses.txt");
 	}
 
@@ -37,7 +43,25 @@ public class Database {
 	public static Database getInstance() {
 		return SingletonHolder.instance;
 	}
-	
+
+	public boolean logMeIn(User toAdd) {
+		synchronized (loginKey) {
+			if (toAdd == null || loggedInUsers.contains(toAdd))
+				return false;
+			loggedInUsers.add(toAdd);
+			return true;
+		}
+	}
+
+	public boolean logMeOut(User toRemove) {
+		synchronized (loginKey) {
+			if (toRemove == null || !loggedInUsers.contains(toRemove))
+				return false;
+			loggedInUsers.remove(toRemove);
+			return true;
+		}
+	}
+
 	/**
 	 * loades the courses from the file path specified 
 	 * into the prjct.Database, returns true if successful.
@@ -77,15 +101,31 @@ public class Database {
 		return true;
 	}
 
-	public void addUser(User u){
-		this.users.add(u);
+	public boolean addUser(User u){
+		synchronized (regKey) {
+			if (u != null && !users.contains(u)) {
+				users.add(u);
+				return true;
+			}
+			return false;
+		}
 	}
 
-	public User getUserByUsername(String username){
+	public User getUserByUsername(String username) {
+//		for (User u : this.users) {
+//			if (u.getUsername().equals(username))
+//				return u;
+//		}
+//		return null;
 		return users.stream().filter(u -> u.getUsername().equals(username)).findFirst().orElse(null);
 	}
 
-	public Course getCourseByNum(int courseNum){
+	public Course getCourseByNum(int courseNum) {
+//		for (Course c : this.courses) {
+//			if (c.getNum() == courseNum)
+//				return c;
+//		}
+//		return null;
 		return courses.stream().filter(c -> c.getNum() == courseNum).findFirst().orElse(null);
 	}
 

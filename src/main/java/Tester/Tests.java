@@ -1,5 +1,6 @@
 package Tester;
 
+import prjct.ReactorMain;
 import prjct.TPCMain;
 
 import java.io.IOException;
@@ -373,7 +374,7 @@ public class Tests implements Runnable {
             for (Course course : courses) {
                 String output = commandProcessor.sendCommand("KDAMCHECK " + course.getCourseNum());
 
-                if (!output.equals(course.getKdamCoursesAsString()))
+                if (!output.contains(course.getKdamCoursesAsString())) // @pasha changed it because of "ACKK 'op'": previous version: if (!output.equals(course.getKdamCoursesAsString()))
                     return "KDAMCHECK Test -Failed the output in not equal to the text file";
             }
         } else return "KDAMCHECK Test -Failed | Failed to Login";

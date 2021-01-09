@@ -6,15 +6,23 @@ import prjct.User;
 
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicIntegerArray;
 import java.util.stream.Collectors;
 
 public class EchoProtocol implements MessagingProtocol<String> {
 
     private boolean shouldTerminate = false;
     private User currUser = null;
-    private Database database;
+    private Database database = Database.getInstance();
     private String currOpCode = "";
     private Object regUnregKey = new Object();
+
+    private final AtomicBoolean loginLock = new AtomicBoolean(false);
+
+// compare if it is false and set it to true, no synchronized needed
+
+
 
     @Override
     public String process(String msg) {
@@ -72,7 +80,7 @@ public class EchoProtocol implements MessagingProtocol<String> {
     }
 
     private String adminreg(String msg) {
-        if (currUser != null)
+        if (loginLock.compareAndSet(true, true))
             return "ERROR " + currOpCode;
         msg.trim();
         int indOf = msg.indexOf(" ");
@@ -83,8 +91,9 @@ public class EchoProtocol implements MessagingProtocol<String> {
         if (database.getUserByUsername(username) != null)
             return "ERROR " + currOpCode;// + "\n";// + "(This username already exist...)\n";
         User u = new User(username, msg, true);
-        database.addUser(u);
-        return "ACK " + currOpCode;// + "\n";
+        if (database.addUser(u))
+            return "ACK " + currOpCode;// + "\n";
+        return "ERROR " + currOpCode;
     }
 
     private String studentreg(String msg) {
@@ -107,11 +116,6 @@ public class EchoProtocol implements MessagingProtocol<String> {
         msg.trim();
         int indOf = msg.indexOf(" ");
         String username = msg.substring(0, indOf).trim();
-        if (currUser != null) {
-            if (currUser.getUsername().equals(username))
-                return "ERROR " + currOpCode;// + "\n";// + "(User " + currUser.getUsername() + " is already logged in...)\n";
-            else return "ERROR " + currOpCode;// + "\n";// + "(Other user is already logged in...)\n";
-        }
         msg = msg.substring(indOf).trim();
         if (username == "" || msg == "")
             return "ERROR " + currOpCode;// + "\n";// + "(Username and Password should be entered...)\n";
@@ -120,16 +124,24 @@ public class EchoProtocol implements MessagingProtocol<String> {
             return "ERROR " + currOpCode;// + "\n";// + "(This username does not exist...)\n";
         if (!user.chkPass(msg))
             return "ERROR " + currOpCode;// + "\n";//+ "(Wrong Username or Password...)\n";
-        currUser = user;
-        return "ACK " + currOpCode;// + "\n";
+        if (loginLock.compareAndSet(false, true) && database.logMeIn(user)) {
+            currUser = user;
+            return "ACK " + currOpCode;
+        } else { return "ERROR " + currOpCode; }
     }
 
     private String logout() {
-        if (currUser == null)
-            return "ERROR " + currOpCode;// + "\n";// + "(There is no logged in user to logout...)\n";
-        currUser = null;
-        shouldTerminate = true;
-        return "ACK " + currOpCode;// + "\n";
+        if (loginLock.compareAndSet(true, false)) {
+            database.logMeOut(currUser);
+            currUser = null;
+            shouldTerminate = true;
+            return "ACK " + currOpCode;
+        } else { return "ERROR " + currOpCode; }
+//        if (currUser == null)
+//            return "ERROR " + currOpCode;// + "\n";// + "(There is no logged in user to logout...)\n";
+//        currUser = null;
+//        shouldTerminate = true;
+//        return "ACK " + currOpCode;// + "\n";
     }
 
     private String coursereg(String msg) {
@@ -164,12 +176,13 @@ public class EchoProtocol implements MessagingProtocol<String> {
     }
 
     private String kdamcheck(String msg) {
-        if (currUser == null)
+        if (loginLock.compareAndSet(false, false))
             return "ERROR " + currOpCode;// + "\n";// + "(You need to login in order to perform actions...)\n";
         Course course = database.getCourseByNum(Integer.parseInt(msg.trim()));
         if (course == null)
             return "ERROR " + currOpCode;// + "\n";// + "(There is no such course...)\n";
-        return "ACK " + currOpCode;// + "\n" + course.kdamimToString() + "\n";
+        String str = "ACK " + currOpCode + "\n" + course.kdamimToString();
+        return str;
     }
 
     private String coursestat(String msg) {

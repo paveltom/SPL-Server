@@ -50,9 +50,10 @@ public class Course {
     public String kdamimToString(){
         String output = "[";
         for (int i = 0; i < kdamim.length; i++){
-            output = output + kdamim[i] + ",";
+            output = output + kdamim[i];
+            if (i != kdamim.length - 1)
+                output = output + ",";
         }
-        output = output.substring(0, (output.length()-1));
         output = output + "]";
         return output;
     }
