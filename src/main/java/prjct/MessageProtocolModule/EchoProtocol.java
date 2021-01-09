@@ -14,6 +14,7 @@ public class EchoProtocol implements MessagingProtocol<String> {
     private User currUser = null;
     private Database database;
     private String currOpCode = "";
+    private Object regUnregKey = new Object();
 
     @Override
     public String process(String msg) {
@@ -155,7 +156,9 @@ public class EchoProtocol implements MessagingProtocol<String> {
         }
         if (course.getMaxStudsNum() == course.getCurrStudsNum())
             return "ERROR " + currOpCode;// + "\n";// + "(There is no available place in this course...)\n";
-        course.addStudent();
+        synchronized (regUnregKey) {
+            course.addStudent();
+        }
         currUser.addCourse(course);
         return "ACK " + currOpCode;// + "\n";
     }
@@ -183,9 +186,12 @@ public class EchoProtocol implements MessagingProtocol<String> {
             usersIn.sort(Comparator.comparing(User::getUsername));
             usersOutput = Arrays.toString(usersIn.stream().map(User::getUsername).collect(Collectors.toList()).toArray());
         }
-
+        int diff = 0;
+        synchronized (regUnregKey) {
+            diff = (course.getMaxStudsNum() - course.getCurrStudsNum());
+        }
         return "ACK " + currOpCode + "\n" + "Course: (" + course.getNum() + ") " + course.getName() + "\n"
-                + "Seats available: " + (course.getMaxStudsNum() - course.getCurrStudsNum()) + "/" + course.getMaxStudsNum() + "\n"
+                + "Seats available: " + diff + "/" + course.getMaxStudsNum() + "\n"
                 + "Students Registered: " + usersOutput;// + "\n";
     }
 
@@ -235,7 +241,9 @@ public class EchoProtocol implements MessagingProtocol<String> {
         if (currUser.isAdmin())
             return "ERROR " + currOpCode;
         currUser.unregisterCourse(course);
-        course.removeStudent();
+        synchronized (regUnregKey) {
+            course.removeStudent();
+        }
         return "ACK " + currOpCode;// + "\n";
     }
 

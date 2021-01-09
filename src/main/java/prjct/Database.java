@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Passive object representing the prjct.Database where all courses and users are stored.
@@ -15,8 +17,8 @@ import java.util.List;
  */
 public class Database {
 
-	private List<Course> courses;
-	private List<User> users;
+	private BlockingQueue<Course> courses;
+	private BlockingQueue<User> users;
 
 	private static class SingletonHolder{
 		private static Database instance = new Database();
@@ -24,8 +26,8 @@ public class Database {
 
 	//to prevent user from creating new prjct.Database
 	private Database() {
-		courses = new ArrayList<>();
-		users = new ArrayList<>();
+		courses = new LinkedBlockingQueue<>();
+		users = new LinkedBlockingQueue<>();
 		initialize("./Courses.txt");
 	}
 
@@ -87,11 +89,11 @@ public class Database {
 		return courses.stream().filter(c -> c.getNum() == courseNum).findFirst().orElse(null);
 	}
 
-	public List<Course> getCourses() {
+	public BlockingQueue<Course> getCourses() {
 		return courses;
 	}
 
-	public List<User> getUsers() {
+	public BlockingQueue<User> getUsers() {
 		return users;
 	}
 }

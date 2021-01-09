@@ -408,7 +408,7 @@ public class Tests implements Runnable {
         CommandProcessor commandProcessorOfAdmin=new CommandProcessor();
         commandProcessorOfAdmin.initialize();
         commandProcessorOfStudent.sendCommand("ADMINREG A A");
-        //commandProcessorOfStudent.sendCommand("LOGIN RON0 RON0");
+        commandProcessorOfStudent.sendCommand("LOGIN RON0 RON0");
         commandProcessorOfAdmin.sendCommand("LOGIN A A");
         ArrayList<Course> courses1 = registerToCourses(commandProcessorOfStudent);
         String courseList="Courses: "+listToString(courses1);
