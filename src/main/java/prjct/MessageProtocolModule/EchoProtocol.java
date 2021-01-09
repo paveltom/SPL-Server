@@ -25,7 +25,7 @@ public class EchoProtocol implements MessagingProtocol<String> {
             //String output = "";
             int indOf = 0;
             if (msg.trim().length() == 1 || msg.trim().length() == 2)
-                currOpCode = msg;
+                currOpCode = msg.trim();
             if (msg.trim().length() > 2) {
                 indOf = msg.indexOf(" ");
                 currOpCode = msg.substring(0, indOf);

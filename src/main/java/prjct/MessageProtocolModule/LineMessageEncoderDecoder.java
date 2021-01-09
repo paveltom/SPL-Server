@@ -33,7 +33,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
 //            if (op < 10)
 //                result += "0" + op + " ";
 //            else
-            result += "" + op + " ";
+            result += "" + op + " "; //result += "" + op + " ";
             startFrom = 2;
         }
 //        if (nextByte == '\n') {
