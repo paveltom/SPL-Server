@@ -27,14 +27,14 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
             flag1 = false;
             flag2 = false;
         }
-        if (len == 2){
+        if (len == 2) {
             result = "";
             op = bytesToShort(bytes);
-            if(op<10)
-            result += "0" + op + " ";
-            else
+//            if (op < 10)
+//                result += "0" + op + " ";
+//            else
             result += "" + op + " ";
-            startFrom=2;
+            startFrom = 2;
         }
 //        if (nextByte == '\n') {
 //            return popString();
@@ -62,7 +62,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
                     zeroCount = 0;
                     startFrom = 0;
                     op = 0;
-                    bytes = new byte[1<<10];
+                    bytes = new byte[1 << 10];
                     return result;
                 }
                 break;
@@ -88,7 +88,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
                     zeroCount = 0;
                     startFrom = 0;
                     op = 0;
-                    bytes = new byte[1<<10];
+                    bytes = new byte[1 << 10];
                     return result;
                 }
                 break;
@@ -98,7 +98,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
                 len = 0;
                 startFrom = 0;
                 op = 0;
-                bytes = new byte[1<<10];
+                bytes = new byte[1 << 10];
                 return result;
 
             case 5: // register to course
@@ -116,7 +116,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
                     len = 0;
                     startFrom = 0;
                     op = 0;
-                    bytes = new byte[1<<10];
+                    bytes = new byte[1 << 10];
                     return result;
                 }
                 break;
@@ -134,7 +134,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
                     zeroCount = 0;
                     startFrom = 0;
                     op = 0;
-                    bytes = new byte[1<<10];
+                    bytes = new byte[1 << 10];
                     return result;
                 }
                 break;
@@ -142,7 +142,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
             default:
                 if (len == 2) {
                     len = 0;
-                    bytes = new byte[1<<10];
+                    bytes = new byte[1 << 10];
                     return "ERROR: No such command...";
                 }
                 break;
@@ -157,9 +157,9 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
         if (len == 0)
             result = "";
         int curI = 0;
-        String[] mess = message.split( "\n");
+        String[] mess = message.split("\n");
         String[] opCode = mess[0].split(" ");
-        if(opCode[0].equals("ACK")) {
+        if (opCode[0].equals("ACK")) {
             short ack = 12;
             byte[] ackCode = shortToBytes(ack);
 
@@ -173,7 +173,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
             }
             byte[] optionalBytes = optional.getBytes(StandardCharsets.UTF_8);
 
-            byte[] resultBytes = new byte[ackCode.length+msgOp.length+optionalBytes.length+1];
+            byte[] resultBytes = new byte[ackCode.length + msgOp.length + optionalBytes.length + 1];
             for (int i = 0; i < ackCode.length; i++) {
                 resultBytes[curI + i] = ackCode[i];
             }
@@ -191,10 +191,9 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
             curI += optionalBytes.length;
 
             resultBytes[curI] = '\0';
-            System.out.println(Arrays.toString(resultBytes));
+            //System.out.println(Arrays.toString(resultBytes));
             return resultBytes;
-        }
-        else if(opCode[0].equals("ERROR")){
+        } else if (opCode[0].equals("ERROR")) {
             short error = 13;
             byte[] ackCode = shortToBytes(error);
 
@@ -208,7 +207,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
             }
             byte[] optionalBytes = optional.getBytes(StandardCharsets.UTF_8);
 
-            byte[] resultBytes = new byte[ackCode.length+msgOp.length+optionalBytes.length+1];
+            byte[] resultBytes = new byte[ackCode.length + msgOp.length + optionalBytes.length + 1];
             for (int i = 0; i < ackCode.length; i++) {
                 resultBytes[curI + i] = ackCode[i];
             }
@@ -226,10 +225,9 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
             curI += optionalBytes.length;
 
             resultBytes[curI] = '\0';
-            System.out.println( Arrays.toString(resultBytes));
+            //System.out.println(Arrays.toString(resultBytes));
             return resultBytes;
-        }
-        else
+        } else
             return null;
     }
 
@@ -241,7 +239,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
         bytes[len++] = nextByte;
     }
 
-    public String popString(int startFrom , int end) { //change to private!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    public String popString(int startFrom, int end) { //change to private!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         //notice that we explicitly requesting that the string will be decoded from UTF-8
         //this is not actually required as it is the default encoding in java.
         return new String(bytes, startFrom, end, StandardCharsets.UTF_8);
@@ -249,17 +247,16 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
         //return curResult;
     }
 
-    public short bytesToShort(byte[] byteArr)
-    {
-        short result = (short)((byteArr[0] & 0xFF) << 8);
-        result += (short)(byteArr[1] & 0xFF);
+    public short bytesToShort(byte[] byteArr) {
+        short result = (short) ((byteArr[0] & 0xFF) << 8);
+        result += (short) (byteArr[1] & 0xFF);
         return result;
     }
-    public byte[] shortToBytes(short num)
-    {
+
+    public byte[] shortToBytes(short num) {
         byte[] bytesArr = new byte[2];
-        bytesArr[0] = (byte)((num >> 8) & 0xFF);
-        bytesArr[1] = (byte)(num & 0xFF);
+        bytesArr[0] = (byte) ((num >> 8) & 0xFF);
+        bytesArr[1] = (byte) (num & 0xFF);
         return bytesArr;
     }
 }

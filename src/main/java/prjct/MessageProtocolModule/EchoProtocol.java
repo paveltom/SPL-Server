@@ -23,41 +23,45 @@ public class EchoProtocol implements MessagingProtocol<String> {
             shouldTerminate = false;
             database = Database.getInstance();
             //String output = "";
-            int indOf = 2;
-            if (msg.trim().length() > 2)
+            int indOf = 0;
+            if (msg.trim().length() == 1 || msg.trim().length() == 2)
+                currOpCode = msg;
+            if (msg.trim().length() > 2) {
                 indOf = msg.indexOf(" ");
-            currOpCode = msg.substring(0, indOf);
-            msg = msg.substring(indOf).trim();
+                currOpCode = msg.substring(0, indOf);
+                msg = msg.substring(indOf).trim();
+            }
             switch (currOpCode) {
-                case "01":
+                case "1":
                     return adminreg(msg);
-                case "02":
+                case "2":
                     return studentreg(msg);
-                case "03":
+                case "3":
                     return login(msg);
-                case "04":
+                case "4":
                     return logout();
-                case "05":
+                case "5":
                     return coursereg(msg);
-                case "06":
+                case "6":
                     return kdamcheck(msg);
-                case "07":
+                case "7":
                     return coursestat(msg);
-                case "08":
+                case "8":
                     return studentstat(msg);
-                case "09":
+                case "9":
                     return isregistered(msg);
                 case "10":
                     return unregister(msg);
                 case "11":
                     return mycourses();
                 default:
-                    return "ERROR 13 No such command...";
+                    return "ERROR 13"; // No such command...";
             }
             //System.out.println("EchoProtocol: process output: " + output);
             //return output;
         } catch (Exception e) {
-            return "Exception: " + "\n(" + e.getMessage() + ")\n";
+            //return "Exception: " + "\n(" + e.getMessage() + ")\n";
+            return "ERROR 13";
         }
     }
 

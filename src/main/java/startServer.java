@@ -11,22 +11,22 @@ import java.util.Arrays;
 public class startServer {
 
     public static void main(String[] args) throws IOException {
-        System.out.println("Present Project Directory : "+ System.getProperty("user.dir")+"/Courses.txt");
+//        System.out.println("Present Project Directory : "+ System.getProperty("user.dir")+"/Courses.txt");
 
 //        byte[] bytes = new byte[1 << 10]
 //        String result = new String(, 0, len, StandardCharsets.UTF_8);
-        Reactor baseServer = new Reactor<String>(1, 6666, () -> new EchoProtocol(), () -> new LineMessageEncoderDecoder());
-        baseServer.serve();
+//        Reactor baseServer = new Reactor<String>(1, 6666, () -> new EchoProtocol(), () -> new LineMessageEncoderDecoder());
+//        baseServer.serve();
 
-//        TPCServer tpcServer = new TPCServer(7777, () -> new EchoProtocol(), () -> new LineMessageEncoderDecoder());
-//        tpcServer.serve();
+        TPCServer tpcServer = new TPCServer(7777, () -> new EchoProtocol(), () -> new LineMessageEncoderDecoder());
+        tpcServer.serve();
 
         //STUDENTREG Morty a123
         //LOGIN Morty a123
         //STUDENTSTAT Morty
         //COURSESTAT 32
         //LOGOUT
-        System.out.println("Present Project Directory : "+ System.getProperty("user.dir")+"/Courses.txt");
+//        System.out.println("Present Project Directory : "+ System.getProperty("user.dir")+"/Courses.txt");
         //530->912->482
 
 //        EchoProtocol echo = new EchoProtocol();
