@@ -27,6 +27,16 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
             flag1 = false;
             flag2 = false;
         }
+        if (len == 1){
+            if (nextByte == 4) {
+                op = 4;
+                result += "" + op;
+            }
+            if (nextByte == 11) {
+                op = 11;
+                result += "" + op;
+            }
+        }
         if (len == 2) {
             result = "";
             op = bytesToShort(bytes);
@@ -106,11 +116,11 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
             case 7: // course stat
             case 9: // is registered
             case 10: // unregister
-                if (len == 4) {
+                if (len == 3) {
                     byte[] tempBytes = new byte[1 << 3];
 
                     tempBytes[0] = bytes[2];
-                    tempBytes[1] = bytes[3];
+                    tempBytes[1] = nextByte;
                     short num = bytesToShort(tempBytes);
                     result += ("" + num);
                     len = 0;
@@ -143,7 +153,7 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
                 if (len == 2) {
                     len = 0;
                     bytes = new byte[1 << 10];
-                    return "ERROR: No such command...";
+                    return "ERROR: 13";
                 }
                 break;
         }
@@ -166,10 +176,10 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
             short opCodeShort = Short.parseShort(opCode[1]);
             byte[] msgOp = shortToBytes(opCodeShort);
 
-            String optional = "\n";
+            String optional = "";
             for (int i = 0; i < mess.length - 1; i++) {
-                optional += mess[1 + i];
                 optional += "\n";
+                optional += mess[1 + i];
             }
             byte[] optionalBytes = optional.getBytes(StandardCharsets.UTF_8);
 
@@ -200,14 +210,14 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
             short opCodeShort = Short.parseShort(opCode[1]);
             byte[] msgOp = shortToBytes(opCodeShort);
 
-            String optional = "\n";
-            for (int i = 0; i < mess.length - 1; i++) {
-                optional += mess[1 + i];
-                optional += "\n";
-            }
-            byte[] optionalBytes = optional.getBytes(StandardCharsets.UTF_8);
+//            String optional = "\n";
+//            for (int i = 0; i < mess.length - 1; i++) {
+//                optional += mess[1 + i];
+//                optional += "\n";
+//            }
+//            byte[] optionalBytes = optional.getBytes(StandardCharsets.UTF_8);
 
-            byte[] resultBytes = new byte[ackCode.length + msgOp.length + optionalBytes.length + 1];
+            byte[] resultBytes = new byte[ackCode.length + msgOp.length];
             for (int i = 0; i < ackCode.length; i++) {
                 resultBytes[curI + i] = ackCode[i];
             }
@@ -219,12 +229,12 @@ public class LineMessageEncoderDecoder implements MessageEncoderDecoder<String> 
                 resultBytes[curI + i] = msgOp[i];
             }
             curI += msgOp.length;
-            for (int i = 0; i < optionalBytes.length; i++) {
-                resultBytes[curI + i] = optionalBytes[i];
-            }
-            curI += optionalBytes.length;
+//            for (int i = 0; i < optionalBytes.length; i++) {
+//                resultBytes[curI + i] = optionalBytes[i];
+//            }
+//            curI += optionalBytes.length;
 
-            resultBytes[curI] = '\0';
+            //resultBytes[curI] = '\0';
             //System.out.println(Arrays.toString(resultBytes));
             return resultBytes;
         } else

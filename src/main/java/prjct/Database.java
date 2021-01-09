@@ -26,7 +26,7 @@ public class Database {
 	private Database() {
 		courses = new ArrayList<>();
 		users = new ArrayList<>();
-		initialize("/home/spl211/IdeaProjects/Server/Courses.txt");
+		initialize("./Courses.txt");
 	}
 
 	/**

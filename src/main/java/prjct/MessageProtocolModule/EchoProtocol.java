@@ -71,31 +71,35 @@ public class EchoProtocol implements MessagingProtocol<String> {
     }
 
     private String adminreg(String msg) {
+        if (currUser != null)
+            return "ERROR " + currOpCode;
         msg.trim();
         int indOf = msg.indexOf(" ");
         String username = msg.substring(0, indOf).trim();
         msg = msg.substring(indOf).trim();
         if (username == "" || msg == "")
-            return "ERROR " + currOpCode + "\n";// + "(Username and Password should be entered...)\n";
+            return "ERROR " + currOpCode;// + "\n";// + "(Username and Password should be entered...)\n";
         if (database.getUserByUsername(username) != null)
-            return "ERROR " + currOpCode + "\n";// + "(This username already exist...)\n";
+            return "ERROR " + currOpCode;// + "\n";// + "(This username already exist...)\n";
         User u = new User(username, msg, true);
         database.addUser(u);
-        return "ACK " + currOpCode + "\n";
+        return "ACK " + currOpCode;// + "\n";
     }
 
     private String studentreg(String msg) {
+        if (currUser != null)
+            return "ERROR " + currOpCode;
         msg.trim();
         int indOf = msg.indexOf(" ");
         String username = msg.substring(0, indOf).trim();
         msg = msg.substring(indOf).trim();
         if (username == "" || msg == "")
-            return "ERROR " + currOpCode + "\n";// + "(Username and Password should be entered...)\n";
+            return "ERROR " + currOpCode;// + "\n";// + "(Username and Password should be entered...)\n";
         if (database.getUserByUsername(username) != null)
-            return "ERROR " + currOpCode + "\n";// + "(This username already exist...)\n";
+            return "ERROR " + currOpCode;// + "\n";// + "(This username already exist...)\n";
         User u = new User(username, msg, false);
         database.addUser(u);
-        return "ACK " + currOpCode + "\n";
+        return "ACK " + currOpCode;// + "\n";
     }
 
     private String login(String msg) {
@@ -104,73 +108,75 @@ public class EchoProtocol implements MessagingProtocol<String> {
         String username = msg.substring(0, indOf).trim();
         if (currUser != null) {
             if (currUser.getUsername().equals(username))
-                return "ERROR " + currOpCode + "\n";// + "(User " + currUser.getUsername() + " is already logged in...)\n";
-            else return "ERROR " + currOpCode + "\n";// + "(Other user is already logged in...)\n";
+                return "ERROR " + currOpCode;// + "\n";// + "(User " + currUser.getUsername() + " is already logged in...)\n";
+            else return "ERROR " + currOpCode;// + "\n";// + "(Other user is already logged in...)\n";
         }
         msg = msg.substring(indOf).trim();
         if (username == "" || msg == "")
-            return "ERROR " + currOpCode + "\n";// + "(Username and Password should be entered...)\n";
+            return "ERROR " + currOpCode;// + "\n";// + "(Username and Password should be entered...)\n";
         User user = database.getUserByUsername(username);
         if (user == null)
-            return "ERROR " + currOpCode + "\n";// + "(This username does not exist...)\n";
+            return "ERROR " + currOpCode;// + "\n";// + "(This username does not exist...)\n";
         if (!user.chkPass(msg))
-            return "ERROR " + currOpCode + "\n";//+ "(Wrong Username or Password...)\n";
+            return "ERROR " + currOpCode;// + "\n";//+ "(Wrong Username or Password...)\n";
         currUser = user;
-        return "ACK " + currOpCode + "\n";
+        return "ACK " + currOpCode;// + "\n";
     }
 
     private String logout() {
         if (currUser == null)
-            return "ERROR " + currOpCode + "\n";// + "(There is no logged in user to logout...)\n";
+            return "ERROR " + currOpCode;// + "\n";// + "(There is no logged in user to logout...)\n";
         currUser = null;
         shouldTerminate = true;
-        return "ACK " + currOpCode + "\n";
+        return "ACK " + currOpCode;// + "\n";
     }
 
     private String coursereg(String msg) {
         if (currUser == null)
-            return "ERROR " + currOpCode + "\n";// + "(You need to login in order to perform actions...)\n";
+            return "ERROR " + currOpCode;// + "\n";// + "(You need to login in order to perform actions...)\n";
         Course course = database.getCourseByNum(Integer.parseInt(msg.trim()));
         if (course == null)
-            return "ERROR " + currOpCode + "\n";// + "(There is no such course...)\n";
+            return "ERROR " + currOpCode;// + "\n";// + "(There is no such course...)\n";
+        if (currUser.isAdmin())
+            return "ERROR " + currOpCode;
         BlockingQueue<Course> userKdamim = currUser.getCourses();
         int[] courseKdamim = course.getKdamim();
         if (courseKdamim.length != 0) {
             if (userKdamim.isEmpty())
-                return "ERROR " + currOpCode + "\n";// + "( " + currUser.getUsername() + " does not have all the required KDAMIM...)\n";
+                return "ERROR " + currOpCode;// + "\n";// + "( " + currUser.getUsername() + " does not have all the required KDAMIM...)\n";
             else {
                 for (int i = 0; i < courseKdamim.length; i++) {
                     //if (!userKdamim.contains(courseKdamim[i]))
                     int ind = i;
                     if (!(userKdamim.stream().anyMatch(cour -> cour.getNum() == courseKdamim[ind])))
-                        return "ERROR " + currOpCode + "\n";// + "( " + currUser.getUsername() + " does not have all the required KDAMIM...)\n";
+                        return "ERROR " + currOpCode;// + "\n";// + "( " + currUser.getUsername() + " does not have all the required KDAMIM...)\n";
                 }
             }
         }
         if (course.getMaxStudsNum() == course.getCurrStudsNum())
-            return "ERROR " + currOpCode + "\n";// + "(There is no available place in this course...)\n";
+            return "ERROR " + currOpCode;// + "\n";// + "(There is no available place in this course...)\n";
         course.addStudent();
         currUser.addCourse(course);
-        return "ACK " + currOpCode + "\n";
+        return "ACK " + currOpCode;// + "\n";
     }
 
     private String kdamcheck(String msg) {
         if (currUser == null)
-            return "ERROR " + currOpCode + "\n";// + "(You need to login in order to perform actions...)\n";
+            return "ERROR " + currOpCode;// + "\n";// + "(You need to login in order to perform actions...)\n";
         Course course = database.getCourseByNum(Integer.parseInt(msg.trim()));
         if (course == null)
-            return "ERROR " + currOpCode + "\n";// + "(There is no such course...)\n";
-        return "ACK " + currOpCode + "\n" + course.kdamimToString() + "\n";
+            return "ERROR " + currOpCode;// + "\n";// + "(There is no such course...)\n";
+        return "ACK " + currOpCode;// + "\n" + course.kdamimToString() + "\n";
     }
 
     private String coursestat(String msg) {
         if (currUser == null)
-            return "ERROR " + currOpCode + "\n";// + "(You need to login in order to perform actions...)\n";
+            return "ERROR " + currOpCode;// + "\n";// + "(You need to login in order to perform actions...)\n";
         if (!currUser.isAdmin())
-            return "ERROR " + currOpCode + "\n";// + "(You have to be an admin in order to perform this action...)\n";
+            return "ERROR " + currOpCode;// + "\n";// + "(You have to be an admin in order to perform this action...)\n";
         Course course = database.getCourseByNum(Integer.parseInt(msg.trim()));
         if (course == null)
-            return "ERROR " + currOpCode + "\n";// + "(There is no such course...)\n";
+            return "ERROR " + currOpCode;// + "\n";// + "(There is no such course...)\n";
         List<User> usersIn = database.getUsers().stream().filter(u -> u.getCourses().contains(course)).collect(Collectors.toList());
         String usersOutput = "[]";
         if (!usersIn.isEmpty()) {
@@ -180,55 +186,64 @@ public class EchoProtocol implements MessagingProtocol<String> {
 
         return "ACK " + currOpCode + "\n" + "Course: (" + course.getNum() + ") " + course.getName() + "\n"
                 + "Seats available: " + (course.getMaxStudsNum() - course.getCurrStudsNum()) + "/" + course.getMaxStudsNum() + "\n"
-                + "Students Registered: " + usersOutput + "\n";
+                + "Students Registered: " + usersOutput;// + "\n";
     }
 
     private String studentstat(String msg) {
         if (currUser == null)
-            return "ERROR " + currOpCode + "\n";// + "(You need to login in order to perform actions...)\n";
+            return "ERROR " + currOpCode;// + "\n";// + "(You need to login in order to perform actions...)\n";
         if (!currUser.isAdmin())
-            return "ERROR " + currOpCode + "\n";// + "(You have to be an admin in order to perform this action...)\n";
+            return "ERROR " + currOpCode;// + "\n";// + "(You have to be an admin in order to perform this action...)\n";
         User user = database.getUserByUsername(msg.trim());
         if (user == null)
-            return "ERROR " + currOpCode + "\n";// + "(There is no such user...)\n";
+            return "ERROR " + currOpCode;// + "\n";// + "(There is no such user...)\n";
         if (user.isAdmin())
-            return "ERROR " + currOpCode + "\n";// + "(This user is an admin and not a student...)\n";
+            return "ERROR " + currOpCode;// + "\n";// + "(This user is an admin and not a student...)\n";
 
-        String coursesOutput;
-        if (user.getCourses().isEmpty())
-            coursesOutput = "[]";
-        else coursesOutput = Arrays.toString(user.getCourses().toArray());
-        return "ACK " + currOpCode + "\n" + "Student: " + user.getUsername() + "\n"
-                + "Courses: " + coursesOutput + "\n";
+        //if (user.getCourses().isEmpty())
+        //    coursesOutput = "[]";
+        //else
+        String coursesOutput = user.coursesToString();
+        //System.out.println("EP:STUDENTSTAT_msg: " + msg);
+        String str = "ACK " + currOpCode + "\n" + "Student: " + user.getUsername() + "\n"
+                + "Courses: " + coursesOutput;// + "\n";
+        //System.out.println("EP:STUDENTSTAT_out: " + str);
+        return str;
     }
 
     private String isregistered(String msg) {
         if (currUser == null)
-            return "ERROR " + currOpCode + "\n";// + "(You need to login in order to perform actions...)\n";
+            return "ERROR " + currOpCode;// + "\n";// + "(You need to login in order to perform actions...)\n";
         Course course = database.getCourseByNum(Integer.parseInt(msg.trim()));
         if (course == null)
-            return "ERROR " + currOpCode + "\n";// + "(There is no such course...)\n";
+            return "ERROR " + currOpCode;// + "\n";// + "(There is no such course...)\n";
+        if (currUser.isAdmin())
+            return "ERROR " + currOpCode;
         if (currUser.getCourses().contains(course))
-            return "ACK " + currOpCode + "\n" + "REGISTERED\n";
-        return "ACK " + currOpCode + "\n" + "NOT REGISTERED\n";
+            return "ACK " + currOpCode + "\n" + "REGISTERED";//\n";
+        return "ACK " + currOpCode + "\n" + "NOT REGISTERED";//\n";
     }
 
     private String unregister(String msg) {
         if (currUser == null)
-            return "ERROR " + currOpCode + "\n";// + "(You need to login in order to perform actions...)\n";
+            return "ERROR " + currOpCode;// + "\n";// + "(You need to login in order to perform actions...)\n";
         Course course = database.getCourseByNum(Integer.parseInt(msg.trim()));
         if (course == null)
-            return "ERROR " + currOpCode + "\n";// + "(There is no such course...)\n";
+            return "ERROR " + currOpCode;// + "\n";// + "(There is no such course...)\n";
         if (!currUser.getCourses().contains(course))
-            return "ERROR " + currOpCode + "\n";// + "(" + currUser.getUsername() + " is not registered to this course...)\n";
+            return "ERROR " + currOpCode;// + "\n";// + "(" + currUser.getUsername() + " is not registered to this course...)\n";
+        if (currUser.isAdmin())
+            return "ERROR " + currOpCode;
         currUser.unregisterCourse(course);
         course.removeStudent();
-        return "ACK " + currOpCode + "\n";
+        return "ACK " + currOpCode;// + "\n";
     }
 
     private String mycourses() {
         if (currUser == null)
-            return "ERROR " + currOpCode + "\n";// + "(You need to login in order to perform actions...)\n";
+            return "ERROR " + currOpCode;// + "\n";// + "(You need to login in order to perform actions...)\n";
+        if (currUser.isAdmin())
+            return "ERROR " + currOpCode;
         return "ACK " + currOpCode + "\n" + currUser.coursesToString();
     }
 }
