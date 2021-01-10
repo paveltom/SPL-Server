@@ -22,6 +22,9 @@ public class Database {
 	private BlockingQueue<User> loggedInUsers;
 	private Object loginKey;
 	private Object regKey;
+//	private BlockingQueue<String> msgs;
+//	private BlockingQueue<String> defaultMsgs;
+//	private BlockingQueue<String> errorMsgs;
 
 	private static class SingletonHolder{
 		private static Database instance = new Database();
@@ -34,6 +37,9 @@ public class Database {
 		loggedInUsers = new LinkedBlockingQueue<>();
 		loginKey = new Object();
 		regKey = new Object();
+//		msgs = new LinkedBlockingQueue<>();
+//		defaultMsgs = new LinkedBlockingQueue<>();
+//		errorMsgs = new LinkedBlockingQueue<>();
 		initialize("./Courses.txt");
 	}
 
@@ -53,6 +59,30 @@ public class Database {
 		}
 	}
 
+//	public void addMsg (String msg) {
+//		try {
+//			this.msgs.put(msg);
+//		} catch (InterruptedException exception) {
+//			exception.printStackTrace();
+//		}
+//	}
+//
+//	public void addDefMsg (String msg) {
+//		try {
+//			this.defaultMsgs.put(msg);
+//		} catch (InterruptedException exception) {
+//			exception.printStackTrace();
+//		}
+//	}
+//
+//	public void addErrMsg (String msg) {
+//		try {
+//			this.errorMsgs.put(msg);
+//		} catch (InterruptedException exception) {
+//			exception.printStackTrace();
+//		}
+//	}
+
 	public boolean logMeOut(User toRemove) {
 		synchronized (loginKey) {
 			if (toRemove == null || !loggedInUsers.contains(toRemove))
@@ -60,6 +90,32 @@ public class Database {
 			loggedInUsers.remove(toRemove);
 			return true;
 		}
+	}
+
+	public boolean addUser(User u){
+		synchronized (regKey) {
+			if (u != null && !users.contains(u)) {
+				users.add(u);
+				return true;
+			}
+			return false;
+		}
+	}
+
+	public User getUserByUsername(String username) {
+		return users.stream().filter(u -> u.getUsername().equals(username)).findFirst().orElse(null);
+	}
+
+	public Course getCourseByNum(int courseNum) {
+		return courses.stream().filter(c -> c.getNum() == courseNum).findFirst().orElse(null);
+	}
+
+	public BlockingQueue<Course> getCourses() {
+		return courses;
+	}
+
+	public BlockingQueue<User> getUsers() {
+		return users;
 	}
 
 	/**
@@ -101,39 +157,4 @@ public class Database {
 		return true;
 	}
 
-	public boolean addUser(User u){
-		synchronized (regKey) {
-			if (u != null && !users.contains(u)) {
-				users.add(u);
-				return true;
-			}
-			return false;
-		}
-	}
-
-	public User getUserByUsername(String username) {
-//		for (User u : this.users) {
-//			if (u.getUsername().equals(username))
-//				return u;
-//		}
-//		return null;
-		return users.stream().filter(u -> u.getUsername().equals(username)).findFirst().orElse(null);
-	}
-
-	public Course getCourseByNum(int courseNum) {
-//		for (Course c : this.courses) {
-//			if (c.getNum() == courseNum)
-//				return c;
-//		}
-//		return null;
-		return courses.stream().filter(c -> c.getNum() == courseNum).findFirst().orElse(null);
-	}
-
-	public BlockingQueue<Course> getCourses() {
-		return courses;
-	}
-
-	public BlockingQueue<User> getUsers() {
-		return users;
-	}
 }

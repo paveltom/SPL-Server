@@ -1,5 +1,6 @@
 package Tester;
 
+import prjct.Database;
 import prjct.ReactorMain;
 import prjct.TPCMain;
 
@@ -684,6 +685,7 @@ public class Tests implements Runnable {
             System.out.println("\r\n\r\n----------------------------------");
             for (String testAnswer : testAnswers) System.out.println(testAnswer);
             System.out.println("----------------------------------");
+            Database d = Database.getInstance();
             System.exit(0);
         } catch (Exception testException) {
             testException.printStackTrace();

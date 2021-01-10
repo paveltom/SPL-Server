@@ -4,6 +4,7 @@ import prjct.Course;
 import prjct.Database;
 import prjct.User;
 
+import javax.xml.crypto.Data;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -12,25 +13,39 @@ import java.util.stream.Collectors;
 
 public class EchoProtocol implements MessagingProtocol<String> {
 
-    private boolean shouldTerminate = false;
-    private User currUser = null;
-    private Database database = Database.getInstance();
-    private String currOpCode = "";
-    private Object regUnregKey = new Object();
+    private boolean shouldTerminate;
+    private User currUser;
+    private Database database;
+    private String currOpCode;
+    private Object regUnregKey;
 
     private final AtomicBoolean loginLock = new AtomicBoolean(false);
 
 // compare if it is false and set it to true, no synchronized needed
 
+    public EchoProtocol(){
+        shouldTerminate = false;
+        currUser = null;
+        database = Database.getInstance();
+        currOpCode = "";
+        regUnregKey = new Object();
+    }
+
 
 
     @Override
     public String process(String msg) {
+        if (msg == null || msg.trim().equals("")) {
+            //database.addErrMsg("ERROR 13: " + System.currentTimeMillis());
+            return "ERROR 13";
+        }
+        String toAdd = msg;
+        //database.addMsg(toAdd);
         //System.out.println("EchoProtocol: accepted message: " + msg);
         try {
             //System.out.println( "EchoProtocol: process: " + msg);
-            shouldTerminate = false;
-            database = Database.getInstance();
+            //shouldTerminate = false;
+            //database = Database.getInstance();
             //String output = "";
             int indOf = 0;
             if (msg.trim().length() == 1 || msg.trim().length() == 2)
@@ -64,12 +79,16 @@ public class EchoProtocol implements MessagingProtocol<String> {
                 case "11":
                     return mycourses();
                 default:
+                    //database.addDefMsg(toAdd);
                     return "ERROR 13"; // No such command...";
+
             }
             //System.out.println("EchoProtocol: process output: " + output);
             //return output;
         } catch (Exception e) {
             //return "Exception: " + "\n(" + e.getMessage() + ")\n";
+            //e.printStackTrace();
+            //System.out.println(e.getMessage());
             return "ERROR 13";
         }
     }
@@ -91,13 +110,13 @@ public class EchoProtocol implements MessagingProtocol<String> {
         if (database.getUserByUsername(username) != null)
             return "ERROR " + currOpCode;// + "\n";// + "(This username already exist...)\n";
         User u = new User(username, msg, true);
-        if (database.addUser(u))
+        if (loginLock.compareAndSet(false, false) && database.addUser(u))
             return "ACK " + currOpCode;// + "\n";
         return "ERROR " + currOpCode;
     }
 
     private String studentreg(String msg) {
-        if (currUser != null)
+        if (loginLock.compareAndSet(true, true))
             return "ERROR " + currOpCode;
         msg.trim();
         int indOf = msg.indexOf(" ");
@@ -108,8 +127,9 @@ public class EchoProtocol implements MessagingProtocol<String> {
         if (database.getUserByUsername(username) != null)
             return "ERROR " + currOpCode;// + "\n";// + "(This username already exist...)\n";
         User u = new User(username, msg, false);
-        database.addUser(u);
-        return "ACK " + currOpCode;// + "\n";
+        if (loginLock.compareAndSet(false, false) && database.addUser(u))
+            return "ACK " + currOpCode;// + "\n";
+        return "ERROR " + currOpCode;
     }
 
     private String login(String msg) {
@@ -124,7 +144,7 @@ public class EchoProtocol implements MessagingProtocol<String> {
             return "ERROR " + currOpCode;// + "\n";// + "(This username does not exist...)\n";
         if (!user.chkPass(msg))
             return "ERROR " + currOpCode;// + "\n";//+ "(Wrong Username or Password...)\n";
-        if (loginLock.compareAndSet(false, true) && database.logMeIn(user)) {
+        if (database.logMeIn(user) && loginLock.compareAndSet(false, true)) {
             currUser = user;
             return "ACK " + currOpCode;
         } else { return "ERROR " + currOpCode; }
