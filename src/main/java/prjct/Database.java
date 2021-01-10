@@ -22,6 +22,7 @@ public class Database {
 	private BlockingQueue<User> loggedInUsers;
 	private Object loginKey;
 	private Object regKey;
+	private Object getUserBy;
 //	private BlockingQueue<String> msgs;
 //	private BlockingQueue<String> defaultMsgs;
 //	private BlockingQueue<String> errorMsgs;
@@ -37,6 +38,7 @@ public class Database {
 		loggedInUsers = new LinkedBlockingQueue<>();
 		loginKey = new Object();
 		regKey = new Object();
+		getUserBy = new Object();
 //		msgs = new LinkedBlockingQueue<>();
 //		defaultMsgs = new LinkedBlockingQueue<>();
 //		errorMsgs = new LinkedBlockingQueue<>();
@@ -94,8 +96,12 @@ public class Database {
 
 	public boolean addUser(User u){
 		synchronized (regKey) {
-			if (u != null && !users.contains(u)) {
-				users.add(u);
+			if (users.stream().noneMatch(us -> us.getUsername().equals(u.getUsername()))) {
+				try {
+					users.put(u);
+				} catch (InterruptedException exception) {
+					exception.printStackTrace();
+				}
 				return true;
 			}
 			return false;
@@ -103,7 +109,9 @@ public class Database {
 	}
 
 	public User getUserByUsername(String username) {
-		return users.stream().filter(u -> u.getUsername().equals(username)).findFirst().orElse(null);
+		synchronized (getUserBy) {
+			return users.stream().filter(u -> u.getUsername().equals(username)).findFirst().orElse(null);
+		}
 	}
 
 	public Course getCourseByNum(int courseNum) {

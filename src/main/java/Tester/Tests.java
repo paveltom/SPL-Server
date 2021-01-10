@@ -393,6 +393,8 @@ public class Tests implements Runnable {
         String courseList          = listToString(courses1);
         String myCourses           = commandProcessor.sendCommand("MYCOURSES");
         unregisterFromCourses(commandProcessor,courses1);
+        System.out.println("mycourses: " + myCourses);
+        System.out.println("ronscourses: " + courseList);
         if (!myCourses.equals(courseList)) {
             commandProcessor.sendCommand("LOGOUT");
             return "MYCOURSES Test - Failed 1";
@@ -400,6 +402,8 @@ public class Tests implements Runnable {
         myCourses=commandProcessor.sendCommand("MYCOURSES");
         commandProcessor.sendCommand("LOGOUT");
         commandProcessor.kill();
+        System.out.println("mycourses: " + myCourses);
+        System.out.println("[]");
         if (!myCourses.equals("[]"))
             return "MYCOURSES Test - Failed 2";
         else return "MYCOURSES Test - Passed";
@@ -445,7 +449,7 @@ public class Tests implements Runnable {
             studentList.add("RON"+i);
         }
         studentList.sort(Comparator.naturalOrder());
-        String students="Students Registered: "+studentList.toString().replaceAll(" ","");
+        String students="Students Registered: "+studentList.toString().replaceAll(" "," ");//!!changed!!!!!!!!!!!!!!!!
         CommandProcessor commandProcessorOfAdmin=new CommandProcessor();
         commandProcessorOfAdmin.initialize();
         commandProcessorOfAdmin.sendCommand("LOGIN A A");
@@ -469,7 +473,7 @@ public class Tests implements Runnable {
         String courseName1=tokens1[1];
         String seats1=tokens1[2];
         String studentsL1=tokens1[3];
-        students=students.substring(0,22)+students.substring(27);
+        students=students.substring(0,22)+students.substring(28);
         commandProcessorOfAdmin.sendCommand("LOGOUT");
         if (!ack1.equals("ACK 7")||!courseName1.equals("Course: ("+p.getCourseNum()+") "+p.getCourseName())
                 ||!seats1.equals("Seats Available: "+"1/"+numOfThreads)||!studentsL1.equals(students))

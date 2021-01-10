@@ -2,13 +2,14 @@ package prjct;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Course {
 
     private int num;
     private String name;
     private int[] kdamim;
-    private int currStudsNum;
+    private AtomicInteger currStudsNum;
     private int maxStudsNum;
     private int orderNum;
 
@@ -17,20 +18,20 @@ public class Course {
         this.num = id;
         this.kdamim = kdamim;
         this.maxStudsNum = maxStudsNum;
-        this.currStudsNum = 0;
+        this.currStudsNum = new AtomicInteger(0);
         this.orderNum = orderNum;
     }
 
     public boolean addStudent(){
-        if (currStudsNum == maxStudsNum) return false;
-        currStudsNum++;
+        if (currStudsNum.get() == maxStudsNum) return false;
+        currStudsNum.incrementAndGet();
         return true;
     }
 
     public boolean removeStudent() {
-        if (currStudsNum == 0)
+        if (currStudsNum.get() == 0)
             return false;
-        currStudsNum--;
+        currStudsNum.decrementAndGet();
         return true;
     }
 
@@ -59,7 +60,7 @@ public class Course {
     }
 
     public int getCurrStudsNum() {
-        return currStudsNum;
+        return currStudsNum.get();
     }
 
     public int getMaxStudsNum() {

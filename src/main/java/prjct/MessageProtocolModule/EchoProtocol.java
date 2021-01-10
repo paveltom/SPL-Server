@@ -17,8 +17,8 @@ public class EchoProtocol implements MessagingProtocol<String> {
     private User currUser;
     private Database database;
     private String currOpCode;
-    private Object regUnregKey;
-
+    private Object regKey;
+    private Object courseRegUnreg;
     private final AtomicBoolean loginLock = new AtomicBoolean(false);
 
 // compare if it is false and set it to true, no synchronized needed
@@ -28,7 +28,8 @@ public class EchoProtocol implements MessagingProtocol<String> {
         currUser = null;
         database = Database.getInstance();
         currOpCode = "";
-        regUnregKey = new Object();
+        regKey = new Object();
+        courseRegUnreg = new Object();
     }
 
 
@@ -107,8 +108,10 @@ public class EchoProtocol implements MessagingProtocol<String> {
         msg = msg.substring(indOf).trim();
         if (username == "" || msg == "")
             return "ERROR " + currOpCode;// + "\n";// + "(Username and Password should be entered...)\n";
-        if (database.getUserByUsername(username) != null)
-            return "ERROR " + currOpCode;// + "\n";// + "(This username already exist...)\n";
+        synchronized (regKey) {
+            if (database.getUserByUsername(username) != null)
+                return "ERROR " + currOpCode;// + "\n";// + "(This username already exist...)\n";
+        }
         User u = new User(username, msg, true);
         if (loginLock.compareAndSet(false, false) && database.addUser(u))
             return "ACK " + currOpCode;// + "\n";
@@ -122,10 +125,12 @@ public class EchoProtocol implements MessagingProtocol<String> {
         int indOf = msg.indexOf(" ");
         String username = msg.substring(0, indOf).trim();
         msg = msg.substring(indOf).trim();
-        if (username == "" || msg == "")
-            return "ERROR " + currOpCode;// + "\n";// + "(Username and Password should be entered...)\n";
-        if (database.getUserByUsername(username) != null)
-            return "ERROR " + currOpCode;// + "\n";// + "(This username already exist...)\n";
+        if (username.equals("") || msg.equals(""))
+            return "ERROR " + currOpCode;// (Username and Password should be entered...)
+        synchronized (regKey) {
+            if (database.getUserByUsername(username) != null)
+                return "ERROR " + currOpCode;//  (This username already exist...)
+        }
         User u = new User(username, msg, false);
         if (loginLock.compareAndSet(false, false) && database.addUser(u))
             return "ACK " + currOpCode;// + "\n";
@@ -165,34 +170,36 @@ public class EchoProtocol implements MessagingProtocol<String> {
     }
 
     private String coursereg(String msg) {
-        if (currUser == null)
+        if (loginLock.compareAndSet(false, false))
             return "ERROR " + currOpCode;// + "\n";// + "(You need to login in order to perform actions...)\n";
         Course course = database.getCourseByNum(Integer.parseInt(msg.trim()));
         if (course == null)
             return "ERROR " + currOpCode;// + "\n";// + "(There is no such course...)\n";
         if (currUser.isAdmin())
             return "ERROR " + currOpCode;
-        BlockingQueue<Course> userKdamim = currUser.getCourses();
         int[] courseKdamim = course.getKdamim();
         if (courseKdamim.length != 0) {
-            if (userKdamim.isEmpty())
+            if (currUser.getCourses().isEmpty())
                 return "ERROR " + currOpCode;// + "\n";// + "( " + currUser.getUsername() + " does not have all the required KDAMIM...)\n";
             else {
                 for (int i = 0; i < courseKdamim.length; i++) {
                     //if (!userKdamim.contains(courseKdamim[i]))
                     int ind = i;
-                    if (!(userKdamim.stream().anyMatch(cour -> cour.getNum() == courseKdamim[ind])))
+                    if (!(currUser.getCourses().stream().anyMatch(cour -> cour.getNum() == courseKdamim[ind])))
                         return "ERROR " + currOpCode;// + "\n";// + "( " + currUser.getUsername() + " does not have all the required KDAMIM...)\n";
                 }
             }
         }
         if (course.getMaxStudsNum() == course.getCurrStudsNum())
             return "ERROR " + currOpCode;// + "\n";// + "(There is no available place in this course...)\n";
-        synchronized (regUnregKey) {
-            course.addStudent();
+        //synchronized (regUnregKey) {
+        synchronized (courseRegUnreg) {
+            if (course.addStudent()) {
+                currUser.addCourse(course);
+                return "ACK " + currOpCode;// + "\n";
+            }
         }
-        currUser.addCourse(course);
-        return "ACK " + currOpCode;// + "\n";
+        return "ERROR " + currOpCode;
     }
 
     private String kdamcheck(String msg) {
@@ -206,7 +213,7 @@ public class EchoProtocol implements MessagingProtocol<String> {
     }
 
     private String coursestat(String msg) {
-        if (currUser == null)
+        if (loginLock.compareAndSet(false, false))
             return "ERROR " + currOpCode;// + "\n";// + "(You need to login in order to perform actions...)\n";
         if (!currUser.isAdmin())
             return "ERROR " + currOpCode;// + "\n";// + "(You have to be an admin in order to perform this action...)\n";
@@ -220,16 +227,14 @@ public class EchoProtocol implements MessagingProtocol<String> {
             usersOutput = Arrays.toString(usersIn.stream().map(User::getUsername).collect(Collectors.toList()).toArray());
         }
         int diff = 0;
-        synchronized (regUnregKey) {
-            diff = (course.getMaxStudsNum() - course.getCurrStudsNum());
-        }
+        diff = (course.getMaxStudsNum() - course.getCurrStudsNum());
         return "ACK " + currOpCode + "\n" + "Course: (" + course.getNum() + ") " + course.getName() + "\n"
-                + "Seats available: " + diff + "/" + course.getMaxStudsNum() + "\n"
+                + "Seats Available: " + diff + "/" + course.getMaxStudsNum() + "\n"
                 + "Students Registered: " + usersOutput;// + "\n";
     }
 
     private String studentstat(String msg) {
-        if (currUser == null)
+        if (loginLock.compareAndSet(false, false))
             return "ERROR " + currOpCode;// + "\n";// + "(You need to login in order to perform actions...)\n";
         if (!currUser.isAdmin())
             return "ERROR " + currOpCode;// + "\n";// + "(You have to be an admin in order to perform this action...)\n";
@@ -251,7 +256,7 @@ public class EchoProtocol implements MessagingProtocol<String> {
     }
 
     private String isregistered(String msg) {
-        if (currUser == null)
+        if (loginLock.compareAndSet(false, false))
             return "ERROR " + currOpCode;// + "\n";// + "(You need to login in order to perform actions...)\n";
         Course course = database.getCourseByNum(Integer.parseInt(msg.trim()));
         if (course == null)
@@ -264,24 +269,26 @@ public class EchoProtocol implements MessagingProtocol<String> {
     }
 
     private String unregister(String msg) {
-        if (currUser == null)
+        if (loginLock.compareAndSet(false, false))
             return "ERROR " + currOpCode;// + "\n";// + "(You need to login in order to perform actions...)\n";
         Course course = database.getCourseByNum(Integer.parseInt(msg.trim()));
         if (course == null)
             return "ERROR " + currOpCode;// + "\n";// + "(There is no such course...)\n";
-        if (!currUser.getCourses().contains(course))
+        if (currUser.getCourses().stream().noneMatch(c -> c.getNum() == (Integer.parseInt(msg.trim()))))
             return "ERROR " + currOpCode;// + "\n";// + "(" + currUser.getUsername() + " is not registered to this course...)\n";
         if (currUser.isAdmin())
             return "ERROR " + currOpCode;
-        currUser.unregisterCourse(course);
-        synchronized (regUnregKey) {
-            course.removeStudent();
+        synchronized (courseRegUnreg) {
+            if (currUser.unregisterCourse(course)) {
+                course.removeStudent();
+                return "ACK " + currOpCode;// + "\n";
+            }
         }
-        return "ACK " + currOpCode;// + "\n";
+        return "ERROR " + currOpCode;
     }
 
     private String mycourses() {
-        if (currUser == null)
+        if (loginLock.compareAndSet(false, false))
             return "ERROR " + currOpCode;// + "\n";// + "(You need to login in order to perform actions...)\n";
         if (currUser.isAdmin())
             return "ERROR " + currOpCode;
