@@ -393,8 +393,6 @@ public class Tests implements Runnable {
         String courseList          = listToString(courses1);
         String myCourses           = commandProcessor.sendCommand("MYCOURSES");
         unregisterFromCourses(commandProcessor,courses1);
-        System.out.println("mycourses: " + myCourses);
-        System.out.println("ronscourses: " + courseList);
         if (!myCourses.equals(courseList)) {
             commandProcessor.sendCommand("LOGOUT");
             return "MYCOURSES Test - Failed 1";
@@ -402,8 +400,6 @@ public class Tests implements Runnable {
         myCourses=commandProcessor.sendCommand("MYCOURSES");
         commandProcessor.sendCommand("LOGOUT");
         commandProcessor.kill();
-        System.out.println("mycourses: " + myCourses);
-        System.out.println("[]");
         if (!myCourses.equals("[]"))
             return "MYCOURSES Test - Failed 2";
         else return "MYCOURSES Test - Passed";

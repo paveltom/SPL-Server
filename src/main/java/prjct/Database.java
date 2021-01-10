@@ -23,15 +23,11 @@ public class Database {
 	private Object loginKey;
 	private Object regKey;
 	private Object getUserBy;
-//	private BlockingQueue<String> msgs;
-//	private BlockingQueue<String> defaultMsgs;
-//	private BlockingQueue<String> errorMsgs;
 
-	private static class SingletonHolder{
+	private static class SingletonHolder {
 		private static Database instance = new Database();
 	}
 
-	//to prevent user from creating new prjct.Database
 	private Database() {
 		courses = new LinkedBlockingQueue<>();
 		users = new LinkedBlockingQueue<>();
@@ -39,9 +35,6 @@ public class Database {
 		loginKey = new Object();
 		regKey = new Object();
 		getUserBy = new Object();
-//		msgs = new LinkedBlockingQueue<>();
-//		defaultMsgs = new LinkedBlockingQueue<>();
-//		errorMsgs = new LinkedBlockingQueue<>();
 		initialize("./Courses.txt");
 	}
 
@@ -54,53 +47,32 @@ public class Database {
 
 	public boolean logMeIn(User toAdd) {
 		synchronized (loginKey) {
-			if (toAdd == null || loggedInUsers.contains(toAdd))
+			if (loggedInUsers.contains(toAdd))
 				return false;
-			loggedInUsers.add(toAdd);
+			try {
+				loggedInUsers.put(toAdd);
+			} catch (InterruptedException exception) {
+				exception.printStackTrace();
+			}
 			return true;
 		}
 	}
 
-//	public void addMsg (String msg) {
-//		try {
-//			this.msgs.put(msg);
-//		} catch (InterruptedException exception) {
-//			exception.printStackTrace();
-//		}
-//	}
-//
-//	public void addDefMsg (String msg) {
-//		try {
-//			this.defaultMsgs.put(msg);
-//		} catch (InterruptedException exception) {
-//			exception.printStackTrace();
-//		}
-//	}
-//
-//	public void addErrMsg (String msg) {
-//		try {
-//			this.errorMsgs.put(msg);
-//		} catch (InterruptedException exception) {
-//			exception.printStackTrace();
-//		}
-//	}
-
 	public boolean logMeOut(User toRemove) {
 		synchronized (loginKey) {
-			if (toRemove == null || !loggedInUsers.contains(toRemove))
+			if (!loggedInUsers.contains(toRemove))
 				return false;
 			loggedInUsers.remove(toRemove);
 			return true;
 		}
 	}
 
-	public boolean addUser(User u){
+	public boolean addUser(User u) {
 		synchronized (regKey) {
 			if (users.stream().noneMatch(us -> us.getUsername().equals(u.getUsername()))) {
 				try {
 					users.put(u);
 				} catch (InterruptedException exception) {
-					exception.printStackTrace();
 				}
 				return true;
 			}
@@ -109,9 +81,7 @@ public class Database {
 	}
 
 	public User getUserByUsername(String username) {
-		synchronized (getUserBy) {
-			return users.stream().filter(u -> u.getUsername().equals(username)).findFirst().orElse(null);
-		}
+		return users.stream().filter(u -> u.getUsername().equals(username)).findFirst().orElse(null);
 	}
 
 	public Course getCourseByNum(int courseNum) {
@@ -127,7 +97,7 @@ public class Database {
 	}
 
 	/**
-	 * loades the courses from the file path specified 
+	 * loades the courses from the file path specified
 	 * into the prjct.Database, returns true if successful.
 	 */
 	boolean initialize(String coursesFilePath) {
@@ -135,7 +105,7 @@ public class Database {
 			int courseOrdNum = 0;
 			for (String line; (line = br.readLine()) != null; ) {
 				line = line.trim();
-				if(line.equals("")) continue;
+				if (line.equals("")) continue;
 				int iend = line.indexOf('|');
 				int cNum = Integer.parseInt(line.substring(0, iend));
 
@@ -159,8 +129,9 @@ public class Database {
 				courseOrdNum++;
 				courses.add(c);
 			}
-			// line is not visible here.
-		} catch (Exception e) { return false; }
+		} catch (Exception e) {
+			return false;
+		}
 
 		return true;
 	}

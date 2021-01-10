@@ -9,7 +9,7 @@ public class ReactorMain {
 
     public static void main(String[] args) throws IOException {
 
-        Reactor reactServer = new Reactor(1, 6666, () -> new EchoProtocol(), () -> new LineMessageEncoderDecoder());
+        Reactor reactServer = new Reactor(3, Integer.parseInt(args[0]), () -> new EchoProtocol(), () -> new LineMessageEncoderDecoder());
         reactServer.serve();
     }
 }

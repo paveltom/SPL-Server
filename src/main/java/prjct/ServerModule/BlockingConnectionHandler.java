@@ -6,7 +6,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Arrays;
 
 public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler<T> {
 
@@ -25,34 +24,25 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
 
     @Override
     public void run() {
-        try (Socket sock = this.sock) { //just for automatic closing
+        try (Socket sock = this.sock) {
             int read;
 
             in = new BufferedInputStream(sock.getInputStream());
-            //System.out.println(in);
             out = new BufferedOutputStream(sock.getOutputStream());
 
             while (!protocol.shouldTerminate() && connected && (read = in.read()) >= 0) {
-                //System.out.println(read);
-
                 T nextMessage = encdec.decodeNextByte((byte) read);
                 if (nextMessage != null) {
-                    //System.out.println(nextMessage);
                     T response = protocol.process(nextMessage);
                     if (response != null) {
-                        //System.out.println(response);
-                        //byte[] bytes = encdec.encode(response);
-                        //System.out.println(Arrays.toString(bytes));
                         out.write(encdec.encode(response));
                         out.flush();
                     }
                 }
             }
-
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-
     }
 
     @Override
